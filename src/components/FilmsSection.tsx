@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { SectionWrapper } from "./SectionWrapper";
+import Aurora from "./Aurora";
 
 interface Film {
   id: string;
@@ -11,7 +12,7 @@ interface Film {
 }
 
 const FILMS: Film[] = [
- {
+  {
     id: "1",
     title: "A Symphony of Vows",
     description: "A breathtaking cinematic journey capturing the intimate moments before the altar, set against a stunning heritage backdrop.",
@@ -69,7 +70,7 @@ const FilmPlayer = ({ film, isEven }: { film: Film; isEven: boolean }) => {
     >
       <div className="relative w-full aspect-video rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl bg-zinc-950 border border-white/5 ring-1 ring-white/10 group cursor-pointer">
         {!isPlaying ? (
-          <div 
+          <div
             className="absolute inset-0 w-full h-full z-20 flex items-center justify-center"
             onClick={() => setIsPlaying(true)}
           >
@@ -80,13 +81,13 @@ const FilmPlayer = ({ film, isEven }: { film: Film; isEven: boolean }) => {
               className="absolute inset-0 w-full h-full object-cover opacity-60 transition-transform duration-[1.5s] ease-out group-hover:scale-105"
               loading="lazy"
             />
-            
+
             {/* Premium, Minimalist Custom Play Overlay */}
             <div className="relative z-30 flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-black/20 backdrop-blur-md border border-white/20 transition-all duration-500 ease-out group-hover:bg-white group-hover:border-white shadow-xl group-hover:scale-110">
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                viewBox="0 0 24 24" 
-                fill="currentColor" 
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
                 className="w-6 h-6 md:w-8 md:h-8 text-white transition-colors duration-500 ease-out group-hover:text-black translate-x-[2px]"
               >
                 <path fillRule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clipRule="evenodd" />
@@ -106,7 +107,7 @@ const FilmPlayer = ({ film, isEven }: { film: Film; isEven: boolean }) => {
             allowFullScreen
           />
         )}
-        
+
         {/* Decorative inner border frame */}
         <div className="absolute inset-0 z-40 pointer-events-none ring-1 ring-inset ring-white/10 rounded-[2rem] md:rounded-[3rem]" />
       </div>
@@ -117,19 +118,29 @@ const FilmPlayer = ({ film, isEven }: { film: Film; isEven: boolean }) => {
 export const FilmsSection = () => {
   return (
     <section className="py-32 px-6 max-w-7xl mx-auto overflow-hidden">
-      <SectionWrapper direction="up">
-        <div className="text-center mb-24 md:mb-32">
-          <h2 className="text-[10px] md:text-xs uppercase tracking-[0.6em] text-yellow-600 font-bold mb-6">
-            Cinematic Archive
-          </h2>
-          <h3 className="text-5xl md:text-7xl font-serif text-white italic tracking-tighter">
-            Our Films
-          </h3>
-          <p className="premium-para mt-8 max-w-xl mx-auto !text-white/70">
-            Experience the motion and emotion. Our cinematic approach blends documentary storytelling with high-fashion aesthetics.
-          </p>
-        </div>
-      </SectionWrapper>
+      {/* Aurora lives in this fixed-height hero block only — NOT the whole
+          section below, which is several thousand px tall once you stack
+          7 film cards. Keeping it to a screen-sized box means:
+          (1) the glow reads as moving bands of light instead of a flat
+              fill (the shader's math is relative to this box's height), and
+          (2) the shader only ever renders a reasonable pixel count per
+              frame instead of the entire scroll height — fixes the lag. */}
+      <div className="relative mb-24 md:mb-32 flex min-h-[560px] items-center justify-center overflow-hidden rounded-[2rem] bg-black md:min-h-[680px] md:rounded-[3rem]">
+        <Aurora />
+        <SectionWrapper direction="up" className="relative z-10 w-full">
+          <div className="px-6 text-center">
+            <h2 className="text-[10px] md:text-xs uppercase tracking-[0.6em] text-yellow-600 font-bold mb-6">
+              Cinematic Archive
+            </h2>
+            <h3 className="text-5xl md:text-7xl font-serif text-white italic tracking-tighter">
+              Our Films
+            </h3>
+            <p className="premium-para mt-8 max-w-xl mx-auto !text-white/70">
+              Experience the motion and emotion. Our cinematic approach blends documentary storytelling with high-fashion aesthetics.
+            </p>
+          </div>
+        </SectionWrapper>
+      </div>
 
       <div className="flex flex-col gap-32 md:gap-40">
         {FILMS.map((film, index) => {
@@ -141,7 +152,7 @@ export const FilmsSection = () => {
                 isEven ? "md:flex-row" : "md:flex-row-reverse"
               } items-center gap-12 md:gap-24`}
             >
-              {/* Refactored Interactive Video Player */}
+              {/* Interactive Video Player */}
               <FilmPlayer film={film} isEven={isEven} />
 
               {/* Text Content */}

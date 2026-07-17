@@ -19,11 +19,6 @@ interface BubbleConfig {
   x: string;
   y: string;
   range: [number, number];
-  // Drift is in viewport-width units (vw), NOT percent-of-self.
-  // Using vw keeps the motion predictable regardless of bubble size —
-  // previously drift was a `%` on `x`/`y`, which Framer Motion resolves
-  // relative to the element's OWN width, so large bubbles drifted much
-  // further than small ones and the whole set skewed left on scroll.
   drift: { x: number; y: number };
   priority?: boolean; // hide on very small screens to cut load
 }
@@ -41,10 +36,8 @@ const Bubble: React.FC<{
   // no per-bubble springs, so nothing extra to simulate per frame.
   const opacity = useTransform(progress, [start, start + 0.15, end - 0.15, end], [0, 1, 1, 0]);
   const scale = useTransform(progress, [start, mid, end], [0.6, 1.8, 0.6]);
-  // vw-based drift: consistent physical distance on screen no matter
-  // how big the individual bubble is.
-  const driftX = useTransform(progress, [start, end], ["0vw", `${config.drift.x}vw`]);
-  const driftY = useTransform(progress, [start, end], ["0vw", `${config.drift.y}vw`]);
+  const driftX = useTransform(progress, [start, end], ["0%", `${config.drift.x}%`]);
+  const driftY = useTransform(progress, [start, end], ["0%", `${config.drift.y}%`]);
 
   // Fluid, CSS-resolved size — no JS mobile detection, no post-mount
   // resize flash. Scales smoothly between a mobile floor and desktop cap.
@@ -56,7 +49,7 @@ const Bubble: React.FC<{
       className={config.priority ? undefined : "hidden xs:block"}
       style={{
         position: "absolute",
-        left: `clamp(6%, ${config.x}, 94%)`,
+        left: `clamp(8%, ${config.x}, 92%)`,
         top: config.y,
         width: sizeStyle,
         height: sizeStyle,
@@ -190,11 +183,11 @@ export const BubbleScroll: React.FC = () => {
     // Only pick images from these categories as per request
     const validCategories = ["Wedding", "Pre-Wedding", "Engagement", "Rituals"];
     const filteredImages = GALLERY_DATA.filter((item) => validCategories.includes(item.category));
-
+    
     // Shuffle and take 8
     const shuffled = [...filteredImages].sort(() => 0.5 - Math.random());
     const selected = shuffled.slice(0, 8).map(item => item.imageUrl);
-
+    
     // Fallback if not enough images
     while (selected.length > 0 && selected.length < 8) {
       selected.push(selected[Math.floor(Math.random() * selected.length)]);
@@ -219,30 +212,17 @@ export const BubbleScroll: React.FC = () => {
 
   const progress = prefersReducedMotion ? scrollYProgress : smoothProgress;
 
-  // Bubbles are assigned to 4 fixed horizontal "columns" spread evenly
-  // across the viewport (~12%, 38%, 62%, 88%), cycling through them so
-  // no two consecutive bubbles land in the same band. Drift then nudges
-  // each bubble by a small, size-independent vw amount instead of
-  // dragging everything toward one side.
   const bubbles: BubbleConfig[] = useMemo(() => {
     if (randomImages.length < 8) return [];
     return [
-      // Column A (~12%)
-      { url: randomImages[0], size: 500, x: "12%", y: "25%", range: [0, 0.4], drift: { x: 6, y: -14 }, priority: true },
-      // Column C (~62%)
-      { url: randomImages[1], size: 350, x: "62%", y: "20%", range: [0.1, 0.5], drift: { x: -6, y: -10 }, priority: true },
-      // Column B (~38%)
-      { url: randomImages[2], size: 420, x: "38%", y: "60%", range: [0.25, 0.65], drift: { x: 8, y: -16 }, priority: true },
-      // Column D (~88%)
-      { url: randomImages[3], size: 280, x: "88%", y: "45%", range: [0.35, 0.75], drift: { x: -10, y: -12 } },
-      // Column A (~15%, offset slightly from bubble 1)
-      { url: randomImages[4], size: 480, x: "15%", y: "58%", range: [0.5, 0.85], drift: { x: 10, y: -15 }, priority: true },
-      // Column C (~68%)
-      { url: randomImages[5], size: 380, x: "68%", y: "75%", range: [0.6, 0.95], drift: { x: -5, y: -18 } },
-      // Column B (~30%)
-      { url: randomImages[6], size: 400, x: "30%", y: "80%", range: [0.75, 1.0], drift: { x: 6, y: -14 }, priority: true },
-      // Column D (~82%)
-      { url: randomImages[7], size: 520, x: "82%", y: "18%", range: [0.8, 1.0], drift: { x: -9, y: -20 } },
+      { url: randomImages[0], size: 500, x: "15%", y: "30%", range: [0, 0.4], drift: { x: 50, y: -80 }, priority: true },
+      { url: randomImages[1], size: 350, x: "70%", y: "25%", range: [0.1, 0.5], drift: { x: -40, y: -60 }, priority: true },
+      { url: randomImages[2], size: 420, x: "30%", y: "60%", range: [0.25, 0.65], drift: { x: 60, y: -100 }, priority: true },
+      { url: randomImages[3], size: 280, x: "80%", y: "45%", range: [0.35, 0.75], drift: { x: -80, y: -70 } },
+      { url: randomImages[4], size: 480, x: "10%", y: "50%", range: [0.5, 0.85], drift: { x: 100, y: -90 }, priority: true },
+      { url: randomImages[5], size: 380, x: "65%", y: "70%", range: [0.6, 0.95], drift: { x: -30, y: -120 } },
+      { url: randomImages[6], size: 400, x: "25%", y: "75%", range: [0.75, 1.0], drift: { x: 40, y: -90 }, priority: true },
+      { url: randomImages[7], size: 520, x: "60%", y: "20%", range: [0.8, 1.0], drift: { x: -60, y: -150 } },
     ];
   }, [randomImages]);
 
