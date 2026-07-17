@@ -128,10 +128,7 @@ export default function Home() {
         <BubbleScroll />
       </div>
 
-      {/* Films Section */}
-      <div className="relative z-10 bg-gradient-to-b from-transparent via-black/40 to-transparent">
-        <FilmsSection />
-      </div>
+   
 
       {/* Why Us Cards */}
       <section className="py-40 px-6 overflow-hidden">
@@ -155,6 +152,10 @@ export default function Home() {
           ))}
         </div>
       </section>
+         {/* Films Section */}
+      <div className="relative z-10 bg-gradient-to-b from-transparent via-black/40 to-transparent">
+        <FilmsSection />
+      </div>
 
       {/* CTA */}
       <section className="pb-40 px-6 overflow-hidden">
