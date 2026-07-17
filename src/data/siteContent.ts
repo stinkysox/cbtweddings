@@ -1,7 +1,12 @@
+import introImg from "@/assets/wedding-photography/cbt-wedding-ceremony-03.webp";
+import philosophyImg from "@/assets/wedding-photography/cbt-wedding-editorial-02.webp";
+import archiveImg1 from "@/assets/wedding-photography/cbt-wedding-editorial-11.webp";
+import archiveImg2 from "@/assets/wedding-photography/cbt-wedding-editorial-12.webp";
+
 export const siteContent = {
   brand: {
-    name: "Weddingwit",
-    logoText: "Weddingwit",
+    name: "CBT Weddings",
+    logoText: "CBT Weddings",
   },
   navbar: {
     links: [
@@ -27,29 +32,29 @@ export const siteContent = {
     },
     intro: {
       title: "Rooted in",
-      titleAccent: "Pure Emotion.",
-      description: "We weave visual narratives that stand the test of time. Weddingwit is the junction where editorial high-fashion meets the raw, unscripted beauty of human connection.",
+      titleAccent: "Pure Emotions.",
+      description: "We don't chase trends; we capture essence. To us, creativity is the art of subtraction stripping away the performative to reveal the profound. By blending a high-fashion editorial eye with cinematic patience, we weave visual narratives that stand the test of time. We treat every frame not as a checklist, but as a living canvas where raw human emotion writes its own script.",
       linkText: "Our Philosophy",
       linkUrl: "/about",
-      image: "https://i.pinimg.com/1200x/50/36/08/50360859203a51e5de8e30e934ab856d.jpg",
+      image: introImg.src,
     },
     services: [
       {
-        title: "Cinematic Approach",
-        desc: "Expert use of light, motion, and shadow to create a feature-film aesthetic for your memories.",
+        title: "Cinematic Vision",
+        desc: "Observing the play of light, motion, and shadow to frame your day not as a documentary, but as a timeless feature film.",
       },
       {
-        title: "Editorial Style",
-        desc: "Imagery tailored for the cover, blending high-fashion composition with raw intimacy.",
+        title: "Editorial Intent",
+        desc: "Crafting high-fashion compositions worthy of a cover, yet breathing with the unstaged intimacy of real life.",
       },
       {
-        title: "Emotional Purity",
-        desc: "We capture the silent, unseen moments that carry the most weight in your story.",
+        title: "Unforced Emotion",
+        desc: "Tuning in to the silent, unseen moments—the faint glances and subtle breaths that hold the true weight of your story.",
       },
     ],
     finalCta: {
-      title: "Let’s craft your masterpiece.",
-      description: "Limited availability for 2024 & 2025. Each story is selected for its unique visual potential. We would be honored to tell yours.",
+      title: "Let’s preserve the timeless",
+      description: "Limited availability for 2026 & 2027. We intentionally accept a select number of commissions each year to ensure every story receives our undivided creative presence. We would be honored to witness yours.",
       buttonText: "Book a Consultation",
       buttonLink: "/book",
     },
@@ -59,34 +64,34 @@ export const siteContent = {
       label: "Our Ethos",
       title: "Cinematic Soul,",
       titleAccent: "Timeless Frame.",
-      description: "We are a creative house dedicated to documenting the quiet grandeur and emotional legacies of the world's most beautiful celebrations.",
+      description: "We are a creative house dedicated to tuning into the quiet grandeur and emotional legacies of human connection, allowing the raw beauty of your story to shape its own timeless canvas.",
     },
     philosophy: {
       title: "Beyond the",
       titleAccent: "Standard Frame.",
-      text1: "Weddingwit was founded on a simple belief: wedding cinematography should transcend the typical. We blend authentic documentary storytelling with a sophisticated editorial aesthetic to create films that feel like an archive of emotion.",
-      text2: "Each story is a unique collaboration. We don't just capture events; we capture the visual frequency that makes your connection one of a kind.",
+      text1: "CBT Weddings was born from a desire to elevate wedding imagery into the realm of timeless art. By blending the deliberate composition of editorial design with raw, organic intimacy, we shape visual stories that feel like an archive of pure emotion.",
+      text2: "We believe the most striking frames are never forced. Our approach is to step back, design the space with a filmmaker's eye, and allow the unscripted depth of your reality to unfold naturally.",
       stats: [
         { value: "500+", label: "Stories Archive" },
         { value: "全球", label: "Global Reach" },
       ],
-      image: "https://i.pinimg.com/736x/f5/94/d1/f594d17e5bcd98234cd36a48f5b56a9a.jpg",
+      image: philosophyImg.src,
     },
     pillars: {
       title: "The Pillars",
-      label: "The Weddingwit Standard",
+      label: "The CBT Standard",
       items: [
         {
           title: "Visual Poise",
-          desc: "A commitment to capturing the inherent grace and dignity of every subject, regardless of the setting.",
+          desc: "An unwavering intent to honor the inherent grace and natural dignity of every individual, allowing their true presence to anchor the frame.",
         },
         {
           title: "Atmospheric Light",
-          desc: "Utilizing natural light and shadow to create imagery that feels like a classic cinematic masterpiece.",
+          desc: "Observing the interplay of natural light and shadow to cultivate imagery rich in depth, texture, and cinematic character.",
         },
         {
           title: "Editorial Curation",
-          desc: "A meticulous post-production process that treats your film as a piece of high-end editorial art.",
+          desc: "A deliberate, intentional post-production process that refines your narrative, treating every sequence as a permanent piece of high-end art.",
         },
       ],
     },
@@ -95,23 +100,23 @@ export const siteContent = {
       items: [
         {
           step: "01",
-          title: "Curation",
-          desc: "We curate the most poignant moments, ensuring the narrative flow is as intentional as a feature film.",
+          title: "Intentional Curation",
+          desc: "Filtering out the noise to let the profound breathe, ensuring the final narrative flows with the deliberate cadence of a feature film.",
         },
         {
           step: "02",
-          title: "Authenticity",
-          desc: "We focus on the raw, unscripted glances that carry the most emotional weight.",
+          title: "Unaltered Authenticity",
+          desc: "Tuning into the raw, organic currents of the day—capturing the unscripted glances that carry the true weight of human connection.",
         },
         {
           step: "03",
-          title: "Legacy",
-          desc: "Our end goal is an archive that remains as evocative fifty years from now as it is today.",
+          title: "Enduring Legacy",
+          desc: "Crafting an archive built on permanent truths, designed to remain as emotionally evocative decades from now as it is today.",
         },
       ],
       images: [
-        "https://i.pinimg.com/736x/79/21/c2/7921c220ea25456868c005d8b4ef808c.jpg",
-        "https://i.pinimg.com/736x/5f/0e/07/5f0e070f0f88e6d9b78179f74267025a.jpg",
+        archiveImg1.src,
+        archiveImg2.src,
       ],
     },
     cta: {
@@ -135,7 +140,7 @@ export const siteContent = {
       },
       communication: {
         title: "Communication",
-        email: "archives@weddingwit.com",
+        email: "archives@cbtweddings.com",
         phone: "+91 (0) 40 4567 8910",
       },
       social: {
@@ -173,12 +178,14 @@ export const siteContent = {
     eventTypes: [
       { value: "wedding", label: "Wedding Ceremony" },
       { value: "pre-wedding", label: "Pre-Wedding" },
-      { value: "maternity", label: "Maternity" },
       { value: "engagement", label: "Engagement" },
+      { value: "rituals", label: "Rituals / Haldi" },
+      { value: "family", label: "Family Portrait" },
+      { value: "other", label: "Other Event" },
     ],
   },
   footer: {
-    description: "A bespoke visual boutique for the modern romantic. Archiving the soul of connection from our base in Hyderabad to the world's most beautiful stages.",
+    description: "An intentional visual house weaving editorial art and raw human emotion. Preserving the permanent texture of your history, wherever it unfolds.",
     socials: [
       { name: "Instagram", url: "https://instagram.com", icon: "instagram" },
       { name: "YouTube", url: "https://youtube.com", icon: "youtube" },
@@ -192,16 +199,16 @@ export const siteContent = {
       { name: "Reserve Dates", path: "/book" },
     ],
     contact: {
-      email: "archives@weddingwit.com",
+      email: "archives@cbtweddings.com",
       phone: "+91 (0) 40 4567 8910",
       address: "Jubilee Hills, Hyderabad",
       phoneRaw: "+914045678910", 
     },
     availability: {
-      text: "Accepting exactly 12 commissions worldwide for the 2025 season.",
+      text: "Accepting a select number of commissions worldwide for the 2026 & 2027 seasons.",
       status: "Available Globally",
     },
-    copyright: "Weddingwit Artistry Archive. All Visual Content Protected.",
+    copyright: "CBT Weddings Artistry Archive. All Visual Content Protected.",
     legacies: "Legacies Crafted Globally. Headquartered in Hyderabad, India.",
   },
 };

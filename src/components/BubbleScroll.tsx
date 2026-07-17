@@ -3,6 +3,15 @@
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform, useSpring, useMotionValue, MotionValue } from "framer-motion";
 
+import bubble1 from "@/assets/wedding-photography/cbt-wedding-celebration-01.webp";
+import bubble2 from "@/assets/engagement-photography/cbt-engagement-candid-02.webp";
+import bubble3 from "@/assets/pre-wedding-photography/cbt-pre-wedding-shoot-02.webp";
+import bubble4 from "@/assets/wedding-rituals-photography/cbt-wedding-ritual-03.webp";
+import bubble5 from "@/assets/family-photography/cbt-family-editorial-01.webp";
+import bubble6 from "@/assets/wedding-photography/cbt-wedding-editorial-05.webp";
+import bubble7 from "@/assets/special-events-photography/cbt-special-event-08.webp";
+import bubble8 from "@/assets/wedding-photography/cbt-wedding-moments-03.webp";
+
 interface BubbleConfig {
   url: string;
   size: number;
@@ -185,7 +194,7 @@ export const BubbleScroll: React.FC = () => {
   // Balanced, overlapping ranges to ensure no blank zones
   const bubbles: BubbleConfig[] = [
     {
-      url: "https://i.pinimg.com/736x/b5/23/b3/b523b3e8a7410b20dedbac7491a528af.jpg",
+      url: bubble1.src,
       size: 500,
       x: "15%",
       y: "30%",
@@ -193,7 +202,7 @@ export const BubbleScroll: React.FC = () => {
       drift: { x: 50, y: -80 },
     },
     {
-      url: "https://i.pinimg.com/736x/ba/63/52/ba63529729f2cc61dbac103f6f7bb238.jpg",
+      url: bubble2.src,
       size: 350,
       x: "70%",
       y: "25%",
@@ -201,7 +210,7 @@ export const BubbleScroll: React.FC = () => {
       drift: { x: -40, y: -60 },
     },
     {
-      url: "https://i.pinimg.com/736x/00/bd/a0/00bda06b701af0b5ee56538e55312a06.jpg",
+      url: bubble3.src,
       size: 420,
       x: "30%",
       y: "60%",
@@ -209,7 +218,7 @@ export const BubbleScroll: React.FC = () => {
       drift: { x: 60, y: -100 },
     },
     {
-      url: "https://i.pinimg.com/1200x/70/7c/74/707c741bd1aa9d0c154f81f2bc089bd8.jpg",
+      url: bubble4.src,
       size: 280,
       x: "80%",
       y: "45%",
@@ -217,7 +226,7 @@ export const BubbleScroll: React.FC = () => {
       drift: { x: -80, y: -70 },
     },
     {
-      url: "https://i.pinimg.com/1200x/b8/9c/5f/b89c5f5d181450d685871a21d76d60ae.jpg",
+      url: bubble5.src,
       size: 480,
       x: "10%",
       y: "50%",
@@ -225,7 +234,7 @@ export const BubbleScroll: React.FC = () => {
       drift: { x: 100, y: -90 },
     },
     {
-      url: "https://i.pinimg.com/736x/2d/04/16/2d04167fb5b1b086548758f5f08bf8c4.jpg",
+      url: bubble6.src,
       size: 380,
       x: "65%",
       y: "70%",
@@ -233,7 +242,7 @@ export const BubbleScroll: React.FC = () => {
       drift: { x: -30, y: -120 },
     },
     {
-      url: "https://i.pinimg.com/736x/3a/0e/0c/3a0e0c89e90e0caf232ca5f2bd30ea9d.jpg",
+      url: bubble7.src,
       size: 400,
       x: "25%",
       y: "75%",
@@ -241,7 +250,7 @@ export const BubbleScroll: React.FC = () => {
       drift: { x: 40, y: -90 },
     },
     {
-      url: "https://i.pinimg.com/736x/43/ea/c0/43eac0aed202d47c88a0715a1c56af64.jpg",
+      url: bubble8.src,
       size: 520,
       x: "60%",
       y: "20%",

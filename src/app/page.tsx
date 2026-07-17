@@ -9,21 +9,7 @@ import { MagneticButton } from "../components/MagneticButton";
 import Image from "next/image";
 import { siteContent } from "../data/siteContent";
 import { TextReveal } from "../components/TextReveal";
-
-const AuroraBackground = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-60 dark:opacity-40">
-    <div className="absolute top-[-20%] left-[-10%] w-[80%] h-[80%] bg-yellow-400/20 dark:bg-yellow-900/30 rounded-full aurora-blob" />
-    <div
-      className="absolute bottom-[-15%] right-[-5%] w-[70%] h-[70%] bg-orange-400/20 dark:bg-orange-950/25 rounded-full aurora-blob"
-      style={{ animationDelay: "-8s" }}
-    />
-    <div
-      className="absolute top-[10%] right-[5%] w-[60%] h-[60%] bg-rose-400/15 dark:bg-rose-900/20 rounded-full aurora-blob"
-      style={{ animationDelay: "-15s" }}
-    />
-    <div className="absolute inset-0 bg-white/10 dark:bg-black/20 backdrop-blur-[4px]" />
-  </div>
-);
+import heroImg from "@/assets/wedding-photography/cbt-wedding-ceremony-01.webp";
 
 export default function Home() {
   const { scrollY } = useScroll();
@@ -32,9 +18,21 @@ export default function Home() {
 
   return (
     <div className="w-full">
-      {/* Aurora Hero Section */}
+      {/* Image Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <AuroraBackground />
+        
+        {/* Background Image & Overlay */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src={heroImg}
+            alt="CBT Weddings Hero"
+            fill
+            priority
+            className="object-cover object-center"
+          />
+          {/* Overlay to ensure text readability */}
+          <div className="absolute inset-0 bg-black/40 dark:bg-black/60" />
+        </div>
 
         <motion.div
           style={{ y: heroContentY }}
@@ -57,7 +55,7 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 1.5 }}
-            className="premium-label mb-12 px-4"
+            className="premium-label mb-12 px-4 text-white/90"
           >
             {home.hero.subtitle}
           </motion.p>
@@ -70,7 +68,7 @@ export default function Home() {
             <MagneticButton>
               <Link
                 href={home.hero.ctaLink}
-                className="inline-block px-12 py-5 glass dark:text-white text-[#1A1A1A] rounded-full uppercase tracking-[0.2em] hover:bg-black/5 dark:hover:bg-white/10 transition-all text-[10px] font-bold glow-button border border-black/10 dark:border-white/10 shadow-lg magnetic-target"
+                className="inline-block px-12 py-5 glass text-white rounded-full uppercase tracking-[0.2em] hover:bg-white/10 transition-all text-[10px] font-bold glow-button border border-white/20 shadow-lg magnetic-target"
               >
                 {home.hero.cta}
               </Link>
@@ -78,14 +76,14 @@ export default function Home() {
           </motion.div>
         </motion.div>
 
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4">
-          <span className="text-[10px] text-gray-400 dark:text-white/40 uppercase tracking-[0.3em] vertical-text">
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 z-10">
+          <span className="text-[10px] text-white/60 uppercase tracking-[0.3em] vertical-text">
             Scroll
           </span>
           <motion.div
-            animate={{ y: [0, 15, 0], opacity: [0.2, 0.6, 0.2] }}
+            animate={{ y: [0, 15, 0], opacity: [0.2, 0.8, 0.2] }}
             transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-            className="w-[1px] h-16 bg-gradient-to-b from-yellow-600 dark:from-white to-transparent"
+            className="w-[1px] h-16 bg-gradient-to-b from-white to-transparent"
           />
         </div>
       </section>

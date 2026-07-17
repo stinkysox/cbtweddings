@@ -6,11 +6,9 @@ export type GalleryCategory =
   | "Wedding"
   | "Pre-Wedding"
   | "Engagement"
-  | "Haldi"
-  | "Sangeeth"
-  | "Baby Shoot"
-  | "Maternity"
-  | "Other";
+  | "Rituals"
+  | "Family"
+  | "Other Events";
 
 // Gallery Item
 export interface GalleryItem {

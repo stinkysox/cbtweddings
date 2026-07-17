@@ -4,6 +4,12 @@ import React, { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 
+import galleryImg1 from "@/assets/wedding-photography/cbt-wedding-ceremony-01.webp";
+import galleryImg2 from "@/assets/engagement-photography/cbt-engagement-portrait-01.webp";
+import galleryImg3 from "@/assets/pre-wedding-photography/cbt-pre-wedding-shoot-01.webp";
+import galleryImg4 from "@/assets/wedding-rituals-photography/cbt-wedding-ritual-06.webp";
+import galleryImg5 from "@/assets/wedding-photography/cbt-wedding-editorial-04.webp";
+
 interface GalleryItem {
   id: number | string;
   url: string;
@@ -18,31 +24,31 @@ interface HorizontalGalleryProps {
 const DEFAULT_ITEMS: GalleryItem[] = [
   {
     id: 1,
-    url: "https://i.pinimg.com/736x/8d/68/7c/8d687ca0c53869d80c3569766d78709a.jpg",
+    url: galleryImg1.src,
     title: "Shadows of Love",
     category: "Candid",
   },
   {
     id: 2,
-    url: "https://i.pinimg.com/736x/2a/56/67/2a5667e51c8651817478631199388837.jpg",
+    url: galleryImg2.src,
     title: "The Regal Veil",
     category: "Editorial",
   },
   {
     id: 3,
-    url: "https://i.pinimg.com/1200x/31/31/6a/31316a3c6130386c99c90a169b1397b2.jpg",
+    url: galleryImg3.src,
     title: "Midnight Vows",
     category: "Cinematic",
   },
   {
     id: 4,
-    url: "https://i.pinimg.com/736x/eb/9b/87/eb9b876a3809df6595562d98993876ae.jpg",
+    url: galleryImg4.src,
     title: "Golden Hour Bliss",
     category: "Portraits",
   },
   {
     id: 5,
-    url: "https://i.pinimg.com/736x/6f/9d/2c/6f9d2cb3809fb2a4d0f6828551105781.jpg",
+    url: galleryImg5.src,
     title: "Monochrome Magic",
     category: "Artistic",
   },
