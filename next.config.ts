@@ -5,6 +5,16 @@ const nextConfig: NextConfig = {
   trailingSlash: false,
   compress: true,
 
+  images: {
+    unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "i.postimg.cc",
+      },
+    ],
+  },
+
   // Security and SEO headers
   async headers() {
     return [

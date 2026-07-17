@@ -1,245 +1,228 @@
 import { GalleryItem } from "@/types";
 
-import weddingCeremony01 from "@/assets/wedding-photography/cbt-wedding-ceremony-01.webp";
-import weddingCeremony02 from "@/assets/wedding-photography/cbt-wedding-ceremony-02.webp";
-import weddingCeremony03 from "@/assets/wedding-photography/cbt-wedding-ceremony-03.webp";
-import weddingPortrait01 from "@/assets/wedding-photography/cbt-wedding-portrait-01.webp";
-import weddingPortrait02 from "@/assets/wedding-photography/cbt-wedding-portrait-02.webp";
-import weddingPortrait03 from "@/assets/wedding-photography/cbt-wedding-portrait-03.webp";
-import weddingCandid01 from "@/assets/wedding-photography/cbt-wedding-candid-01.webp";
-import weddingCandid02 from "@/assets/wedding-photography/cbt-wedding-candid-02.webp";
-import weddingMoments01 from "@/assets/wedding-photography/cbt-wedding-moments-01.webp";
-import weddingMoments02 from "@/assets/wedding-photography/cbt-wedding-moments-02.webp";
-import weddingMoments03 from "@/assets/wedding-photography/cbt-wedding-moments-03.webp";
-import weddingDetails01 from "@/assets/wedding-photography/cbt-wedding-details-01.webp";
-import weddingDetails02 from "@/assets/wedding-photography/cbt-wedding-details-02.webp";
-import weddingReception01 from "@/assets/wedding-photography/cbt-wedding-reception-01.webp";
-import weddingReception02 from "@/assets/wedding-photography/cbt-wedding-reception-02.webp";
-import weddingCelebration01 from "@/assets/wedding-photography/cbt-wedding-celebration-01.webp";
-import weddingCelebration02 from "@/assets/wedding-photography/cbt-wedding-celebration-02.webp";
-import weddingCelebration03 from "@/assets/wedding-photography/cbt-wedding-celebration-03.webp";
-import weddingEditorial01 from "@/assets/wedding-photography/cbt-wedding-editorial-01.webp";
-import weddingEditorial02 from "@/assets/wedding-photography/cbt-wedding-editorial-02.webp";
-import weddingEditorial03 from "@/assets/wedding-photography/cbt-wedding-editorial-03.webp";
-import weddingEditorial04 from "@/assets/wedding-photography/cbt-wedding-editorial-04.webp";
-import weddingEditorial05 from "@/assets/wedding-photography/cbt-wedding-editorial-05.webp";
-import weddingEditorial06 from "@/assets/wedding-photography/cbt-wedding-editorial-06.webp";
-import weddingEditorial07 from "@/assets/wedding-photography/cbt-wedding-editorial-07.webp";
-import weddingEditorial08 from "@/assets/wedding-photography/cbt-wedding-editorial-08.webp";
-import weddingEditorial09 from "@/assets/wedding-photography/cbt-wedding-editorial-09.webp";
-import weddingEditorial10 from "@/assets/wedding-photography/cbt-wedding-editorial-10.webp";
-import weddingEditorial11 from "@/assets/wedding-photography/cbt-wedding-editorial-11.webp";
-import weddingEditorial12 from "@/assets/wedding-photography/cbt-wedding-editorial-12.webp";
-
 export const WEDDING_GALLERY: GalleryItem[] = [
   {
     id: "w1",
     category: "Wedding",
-    imageUrl: weddingCeremony01.src,
+    imageUrl: "https://i.postimg.cc/ZRMFSHNR/3Y4A1664.jpg",
     title: "Forever Begins Here",
     description: "A heartfelt union sealed with love and promise.",
   },
   {
     id: "w2",
     category: "Wedding",
-    imageUrl: weddingCeremony02.src,
+    imageUrl: "https://i.postimg.cc/3w9FLYJj/behance-img-10.jpg",
     title: "Whispers of Love",
     description: "Soft moments shared before the vows are spoken.",
   },
   {
     id: "w3",
     category: "Wedding",
-    imageUrl: weddingCeremony03.src,
+    imageUrl: "https://i.postimg.cc/GpzxMdhz/behance-img-11.jpg",
     title: "Two Hearts, One Soul",
     description: "A magical beginning of a lifelong journey together.",
   },
   {
     id: "w4",
     category: "Wedding",
-    imageUrl: weddingPortrait01.src,
+    imageUrl: "https://i.postimg.cc/6q4V5ZVr/behance-img-12.jpg",
     title: "Eternal Vows",
     description: "Promises made under timeless elegance.",
   },
   {
     id: "w5",
     category: "Wedding",
-    imageUrl: weddingPortrait02.src,
+    imageUrl: "https://i.postimg.cc/DZZdHH81/behance-img-13.jpg",
     title: "Love in Every Detail",
     description: "A celebration crafted with romance and grace.",
   },
   {
     id: "w6",
     category: "Wedding",
-    imageUrl: weddingPortrait03.src,
+    imageUrl: "https://i.postimg.cc/W3H6v8kx/behance-img-14.jpg",
     title: "Happily Ever After",
     description: "Where fairytales turn into real memories.",
   },
   {
     id: "w7",
     category: "Wedding",
-    imageUrl: weddingCandid01.src,
+    imageUrl: "https://i.postimg.cc/FHyZL0MM/behance-img-25.jpg",
     title: "Sacred Union",
     description: "An intimate ceremony bound by devotion.",
   },
   {
     id: "w8",
     category: "Wedding",
-    imageUrl: weddingCandid02.src,
+    imageUrl: "https://i.postimg.cc/cJdcMrWj/behance-img-29-Copy.jpg",
     title: "Moments That Matter",
     description: "Captured emotions that last a lifetime.",
   },
   {
     id: "w9",
     category: "Wedding",
-    imageUrl: weddingMoments01.src,
+    imageUrl: "https://i.postimg.cc/hvQ8Pm8M/behance-img-36.jpg",
     title: "A Promise of Forever",
     description: "Love written in glances and smiles.",
   },
   {
     id: "w10",
     category: "Wedding",
-    imageUrl: weddingMoments02.src,
+    imageUrl: "https://i.postimg.cc/ZnvPKNPv/behance-img-4.jpg",
     title: "Timeless Romance",
     description: "Classic love captured in its purest form.",
   },
   {
     id: "w11",
     category: "Wedding",
-    imageUrl: weddingMoments03.src,
+    imageUrl: "https://i.postimg.cc/t435xh0G/behance-img-40-Copy.jpg",
     title: "Written in the Stars",
     description: "A destiny united by love and fate.",
   },
   {
     id: "w12",
     category: "Wedding",
-    imageUrl: weddingDetails01.src,
+    imageUrl: "https://i.postimg.cc/Sss733JG/behance-img-48.jpg",
     title: "The Finest Details",
     description: "Every element curated with cinematic precision.",
   },
   {
     id: "w13",
     category: "Wedding",
-    imageUrl: weddingDetails02.src,
+    imageUrl: "https://i.postimg.cc/rmPCkj4F/behance-img-9.jpg",
     title: "Grace in Stillness",
     description: "A quiet moment of beauty, perfectly framed.",
   },
   {
     id: "w14",
     category: "Wedding",
-    imageUrl: weddingReception01.src,
+    imageUrl: "https://i.postimg.cc/fLrjNCdh/CBT08698.jpg",
     title: "Evening Grandeur",
     description: "An enchanting reception bathed in warm light.",
   },
   {
     id: "w15",
     category: "Wedding",
-    imageUrl: weddingReception02.src,
+    imageUrl: "https://i.postimg.cc/Ssv7hd9Y/CBT08763.jpg",
     title: "Dance of Joy",
     description: "Celebration and laughter under golden chandeliers.",
   },
   {
     id: "w16",
     category: "Wedding",
-    imageUrl: weddingCelebration01.src,
+    imageUrl: "https://i.postimg.cc/vTx7Hn7D/CBT09305.jpg",
     title: "Euphoria Unscripted",
     description: "Pure, unfiltered joy captured in the moment.",
   },
   {
     id: "w17",
     category: "Wedding",
-    imageUrl: weddingCelebration02.src,
+    imageUrl: "https://i.postimg.cc/CKw4HzYY/CBT09325-Copy.jpg",
     title: "Boundless Love",
     description: "A celebration that echoes through generations.",
   },
   {
     id: "w18",
     category: "Wedding",
-    imageUrl: weddingCelebration03.src,
+    imageUrl: "https://i.postimg.cc/s2K4nsDj/CBT09337.jpg",
     title: "Love Amplified",
     description: "When every heartbeat becomes a symphony.",
   },
   {
     id: "w19",
     category: "Wedding",
-    imageUrl: weddingEditorial01.src,
+    imageUrl: "https://i.postimg.cc/GtTPhDPK/CBT09652.jpg",
     title: "Editorial Elegance",
     description: "High-fashion sensibility meets wedding artistry.",
   },
   {
     id: "w20",
     category: "Wedding",
-    imageUrl: weddingEditorial02.src,
+    imageUrl: "https://i.postimg.cc/W4Sw9Tbb/CBT09808.jpg",
     title: "Poised & Perfect",
     description: "A frame worthy of the finest galleries.",
   },
   {
     id: "w21",
     category: "Wedding",
-    imageUrl: weddingEditorial03.src,
+    imageUrl: "https://i.postimg.cc/ZRMFSHNS/MAN00251.jpg",
     title: "Cinematic Splendor",
     description: "Where every angle tells a grander story.",
   },
   {
     id: "w22",
     category: "Wedding",
-    imageUrl: weddingEditorial04.src,
+    imageUrl: "https://i.postimg.cc/xCCyhhcZ/MAN00843.jpg",
     title: "Velvet & Gold",
     description: "Opulent textures woven into visual poetry.",
   },
   {
     id: "w23",
     category: "Wedding",
-    imageUrl: weddingEditorial05.src,
+    imageUrl: "https://i.postimg.cc/fRnCy8rj/MAN00963-Copy.jpg",
     title: "Legacy of Light",
     description: "Luminous moments preserved for eternity.",
   },
   {
     id: "w24",
     category: "Wedding",
-    imageUrl: weddingEditorial06.src,
+    imageUrl: "https://i.postimg.cc/JzNqkjfP/MAN08428.jpg",
     title: "Refined Romance",
     description: "Subtle luxury in every curated detail.",
   },
   {
     id: "w25",
     category: "Wedding",
-    imageUrl: weddingEditorial07.src,
+    imageUrl: "https://i.postimg.cc/htLrdVk9/MAN08428-Copy.jpg",
     title: "The Grand Affair",
     description: "A celebration designed for the ages.",
   },
   {
     id: "w26",
     category: "Wedding",
-    imageUrl: weddingEditorial08.src,
+    imageUrl: "https://i.postimg.cc/nh4kDqyd/MAN09707.jpg",
     title: "Whispered Promises",
     description: "Intimate vows in a world of their own.",
   },
   {
     id: "w27",
     category: "Wedding",
-    imageUrl: weddingEditorial09.src,
+    imageUrl: "https://i.postimg.cc/054cRkGb/MAN09884-Copy.jpg",
     title: "A Regal Beginning",
     description: "Majesty and warmth in perfect balance.",
   },
   {
     id: "w28",
     category: "Wedding",
-    imageUrl: weddingEditorial10.src,
+    imageUrl: "https://i.postimg.cc/5tpSPbNw/MAN09949.jpg",
     title: "Opulent Horizons",
     description: "Where grandeur meets genuine emotion.",
   },
   {
     id: "w29",
     category: "Wedding",
-    imageUrl: weddingEditorial11.src,
+    imageUrl: "https://i.postimg.cc/pLbCrs6r/MAV00298.jpg",
     title: "Soft Focus Love",
     description: "Dreamy, ethereal moments caught in light.",
   },
   {
     id: "w30",
     category: "Wedding",
-    imageUrl: weddingEditorial12.src,
+    imageUrl: "https://i.postimg.cc/YCKR0dsC/MAV00298-Copy.jpg",
     title: "Infinite Tenderness",
     description: "A love story told through the gentlest frames.",
+  },
+  {
+    id: "w31",
+    category: "Wedding",
+    imageUrl: "https://i.postimg.cc/13hBXvjm/MAV00328-Copy.jpg",
+    title: "Beautiful Wedding Moment 31",
+    description: "A stunning moment captured elegantly.",
+  },
+  {
+    id: "w32",
+    category: "Wedding",
+    imageUrl: "https://i.postimg.cc/wvGcp2N7/MAV09970.jpg",
+    title: "Beautiful Wedding Moment 32",
+    description: "A stunning moment captured elegantly.",
   },
 ];

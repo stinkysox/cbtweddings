@@ -1,7 +1,3 @@
-import introImg from "@/assets/wedding-photography/cbt-wedding-ceremony-03.webp";
-import philosophyImg from "@/assets/wedding-photography/cbt-wedding-editorial-02.webp";
-import archiveImg1 from "@/assets/wedding-photography/cbt-wedding-editorial-11.webp";
-import archiveImg2 from "@/assets/wedding-photography/cbt-wedding-editorial-12.webp";
 
 export const siteContent = {
   brand: {
@@ -36,7 +32,7 @@ export const siteContent = {
       description: "We don't chase trends; we capture essence. To us, creativity is the art of subtraction stripping away the performative to reveal the profound. By blending a high-fashion editorial eye with cinematic patience, we weave visual narratives that stand the test of time. We treat every frame not as a checklist, but as a living canvas where raw human emotion writes its own script.",
       linkText: "Our Philosophy",
       linkUrl: "/about",
-      image: introImg.src,
+      image: "https://i.postimg.cc/DZZdHH81/behance-img-13.jpg",
     },
     services: [
       {
@@ -75,7 +71,7 @@ export const siteContent = {
         { value: "500+", label: "Stories Archive" },
         { value: "全球", label: "Global Reach" },
       ],
-      image: philosophyImg.src,
+      image: "https://i.postimg.cc/ZnvPKNPv/behance-img-4.jpg",
     },
     pillars: {
       title: "The Pillars",
@@ -115,8 +111,8 @@ export const siteContent = {
         },
       ],
       images: [
-        archiveImg1.src,
-        archiveImg2.src,
+        "https://i.postimg.cc/rmPCkj4F/behance-img-9.jpg",
+        "https://i.postimg.cc/jdKCjNhD/2.jpg",
       ],
     },
     cta: {

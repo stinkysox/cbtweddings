@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useMemo } from "react";
+import React, { useRef, useMemo, useState, useEffect } from "react";
 import {
   motion,
   useScroll,
@@ -11,14 +11,7 @@ import {
   MotionValue,
 } from "framer-motion";
 
-import bubble1 from "@/assets/wedding-photography/cbt-wedding-celebration-01.webp";
-import bubble2 from "@/assets/engagement-photography/cbt-engagement-candid-02.webp";
-import bubble3 from "@/assets/pre-wedding-photography/cbt-pre-wedding-shoot-02.webp";
-import bubble4 from "@/assets/wedding-rituals-photography/cbt-wedding-ritual-03.webp";
-import bubble5 from "@/assets/family-photography/cbt-family-editorial-01.webp";
-import bubble6 from "@/assets/wedding-photography/cbt-wedding-editorial-05.webp";
-import bubble7 from "@/assets/special-events-photography/cbt-special-event-08.webp";
-import bubble8 from "@/assets/wedding-photography/cbt-wedding-moments-03.webp";
+import { GALLERY_DATA } from "@/data/gallery";
 
 interface BubbleConfig {
   url: string;
@@ -183,6 +176,26 @@ const ScrollIndicator: React.FC<{ progress: MotionValue<number> }> = ({ progress
 export const BubbleScroll: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
+  const [randomImages, setRandomImages] = useState<string[]>([]);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    // Only pick images from these categories as per request
+    const validCategories = ["Wedding", "Pre-Wedding", "Engagement", "Rituals"];
+    const filteredImages = GALLERY_DATA.filter((item) => validCategories.includes(item.category));
+    
+    // Shuffle and take 8
+    const shuffled = [...filteredImages].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, 8).map(item => item.imageUrl);
+    
+    // Fallback if not enough images
+    while (selected.length > 0 && selected.length < 8) {
+      selected.push(selected[Math.floor(Math.random() * selected.length)]);
+    }
+
+    setRandomImages(selected);
+    setMounted(true);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -199,24 +212,41 @@ export const BubbleScroll: React.FC = () => {
 
   const progress = prefersReducedMotion ? scrollYProgress : smoothProgress;
 
-  const bubbles: BubbleConfig[] = useMemo(
-    () => [
-      { url: bubble1.src, size: 500, x: "15%", y: "30%", range: [0, 0.4], drift: { x: 50, y: -80 }, priority: true },
-      { url: bubble2.src, size: 350, x: "70%", y: "25%", range: [0.1, 0.5], drift: { x: -40, y: -60 }, priority: true },
-      { url: bubble3.src, size: 420, x: "30%", y: "60%", range: [0.25, 0.65], drift: { x: 60, y: -100 }, priority: true },
-      { url: bubble4.src, size: 280, x: "80%", y: "45%", range: [0.35, 0.75], drift: { x: -80, y: -70 } },
-      { url: bubble5.src, size: 480, x: "10%", y: "50%", range: [0.5, 0.85], drift: { x: 100, y: -90 }, priority: true },
-      { url: bubble6.src, size: 380, x: "65%", y: "70%", range: [0.6, 0.95], drift: { x: -30, y: -120 } },
-      { url: bubble7.src, size: 400, x: "25%", y: "75%", range: [0.75, 1.0], drift: { x: 40, y: -90 }, priority: true },
-      { url: bubble8.src, size: 520, x: "60%", y: "20%", range: [0.8, 1.0], drift: { x: -60, y: -150 } },
-    ],
-    []
-  );
+  const bubbles: BubbleConfig[] = useMemo(() => {
+    if (randomImages.length < 8) return [];
+    return [
+      { url: randomImages[0], size: 500, x: "15%", y: "30%", range: [0, 0.4], drift: { x: 50, y: -80 }, priority: true },
+      { url: randomImages[1], size: 350, x: "70%", y: "25%", range: [0.1, 0.5], drift: { x: -40, y: -60 }, priority: true },
+      { url: randomImages[2], size: 420, x: "30%", y: "60%", range: [0.25, 0.65], drift: { x: 60, y: -100 }, priority: true },
+      { url: randomImages[3], size: 280, x: "80%", y: "45%", range: [0.35, 0.75], drift: { x: -80, y: -70 } },
+      { url: randomImages[4], size: 480, x: "10%", y: "50%", range: [0.5, 0.85], drift: { x: 100, y: -90 }, priority: true },
+      { url: randomImages[5], size: 380, x: "65%", y: "70%", range: [0.6, 0.95], drift: { x: -30, y: -120 } },
+      { url: randomImages[6], size: 400, x: "25%", y: "75%", range: [0.75, 1.0], drift: { x: 40, y: -90 }, priority: true },
+      { url: randomImages[7], size: 520, x: "60%", y: "20%", range: [0.8, 1.0], drift: { x: -60, y: -150 } },
+    ];
+  }, [randomImages]);
+
+  if (!mounted || bubbles.length < 8) {
+    if (prefersReducedMotion) {
+      return <section ref={containerRef} className="relative py-24 bg-transparent min-h-[400px]" />;
+    }
+    return (
+      <section ref={containerRef} className="relative h-[800vh] bg-transparent">
+        <div className="sticky top-0 h-screen w-full overflow-hidden pointer-events-none">
+          <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none">
+            <h2 className="text-[20vw] font-serif uppercase tracking-tighter leading-none dark:text-white text-black text-center select-none italic">
+              Archive
+            </h2>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   // Respect reduced-motion users entirely — no parallax, just a static collage.
   if (prefersReducedMotion) {
     return (
-      <section className="relative py-24 bg-transparent">
+      <section ref={containerRef} className="relative py-24 bg-transparent">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 px-6">
           {bubbles.map((b, i) => (
             <div key={i} className="aspect-square rounded-full overflow-hidden border border-white/10">

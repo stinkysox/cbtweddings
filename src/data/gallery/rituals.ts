@@ -1,93 +1,88 @@
 import { GalleryItem } from "@/types";
 
-import ritual01 from "@/assets/wedding-rituals-photography/cbt-wedding-ritual-01.webp";
-import ritual02 from "@/assets/wedding-rituals-photography/cbt-wedding-ritual-02.webp";
-import ritual03 from "@/assets/wedding-rituals-photography/cbt-wedding-ritual-03.webp";
-import ritual04 from "@/assets/wedding-rituals-photography/cbt-wedding-ritual-04.webp";
-import ritual05 from "@/assets/wedding-rituals-photography/cbt-wedding-ritual-05.webp";
-import ritual06 from "@/assets/wedding-rituals-photography/cbt-wedding-ritual-06.webp";
-import ritual07 from "@/assets/wedding-rituals-photography/cbt-wedding-ritual-07.webp";
-import ritual08 from "@/assets/wedding-rituals-photography/cbt-wedding-ritual-08.webp";
-import ritual09 from "@/assets/wedding-rituals-photography/cbt-wedding-ritual-09.webp";
-import ritual10 from "@/assets/wedding-rituals-photography/cbt-wedding-ritual-10.webp";
-import ritual11 from "@/assets/wedding-rituals-photography/cbt-wedding-ritual-11.webp";
-
 export const RITUALS_GALLERY: GalleryItem[] = [
   {
     id: "r1",
     category: "Rituals",
-    imageUrl: ritual01.src,
+    imageUrl: "https://i.postimg.cc/brrC0dx8/3Y4A2254-Copy.jpg",
     title: "Golden Beginnings",
     description: "A sacred start bathed in turmeric and laughter.",
   },
   {
     id: "r2",
     category: "Rituals",
-    imageUrl: ritual02.src,
+    imageUrl: "https://i.postimg.cc/rsHhfcg6/behance-img-56.jpg",
     title: "Rituals of Joy",
     description: "Where traditions meet heartfelt celebration.",
   },
   {
     id: "r3",
     category: "Rituals",
-    imageUrl: ritual03.src,
+    imageUrl: "https://i.postimg.cc/Y2Dyrf79/CBT00364.jpg",
     title: "Sunlit Smiles",
     description: "Moments glowing with love and blessings.",
   },
   {
     id: "r4",
     category: "Rituals",
-    imageUrl: ritual04.src,
+    imageUrl: "https://i.postimg.cc/hvvy8hLb/CBT08262.jpg",
     title: "Blessed in Yellow",
     description: "A timeless ritual wrapped in warmth.",
   },
   {
     id: "r5",
     category: "Rituals",
-    imageUrl: ritual05.src,
+    imageUrl: "https://i.postimg.cc/gjjSyrV8/CBT08262-Copy.jpg",
     title: "Pure & Auspicious",
     description: "A moment of tradition, love, and purity.",
   },
   {
     id: "r6",
     category: "Rituals",
-    imageUrl: ritual06.src,
+    imageUrl: "https://i.postimg.cc/mkndmRjS/MAN00230-Copy.jpg",
     title: "Laughter & Haldi",
     description: "Joyful chaos before the wedding bells.",
   },
   {
     id: "r7",
     category: "Rituals",
-    imageUrl: ritual07.src,
+    imageUrl: "https://i.postimg.cc/8ccKdsRc/MAN00760-Copy.jpg",
     title: "Sacred Smears",
     description: "Blessings shared through cherished rituals.",
   },
   {
     id: "r8",
     category: "Rituals",
-    imageUrl: ritual08.src,
+    imageUrl: "https://i.postimg.cc/Fz6PTmpj/MAN01396.jpg",
     title: "Auspicious Beginnings",
     description: "A golden glow before forever begins.",
   },
   {
     id: "r9",
     category: "Rituals",
-    imageUrl: ritual09.src,
+    imageUrl: "https://i.postimg.cc/RhYPg9dP/MAN02437.jpg",
     title: "Rituals in Bloom",
     description: "Traditions carried with love and grace.",
   },
   {
     id: "r10",
     category: "Rituals",
-    imageUrl: ritual10.src,
+    imageUrl: "https://i.postimg.cc/MHLs9x59/MAN02437-Copy.jpg",
     title: "Blessed Moments",
     description: "Family, laughter, and sacred smiles.",
   },
   {
     id: "r11",
     category: "Rituals",
-    imageUrl: ritual11.src,
+    imageUrl: "https://i.postimg.cc/j218MKcc/MAN02860.jpg",
     title: "Golden Traditions",
     description: "Honoring customs before the union.",
+  },
+  {
+    id: "r12",
+    category: "Rituals",
+    imageUrl: "https://i.postimg.cc/wx4bqczy/MAV08546.jpg",
+    title: "Beautiful Rituals Moment 12",
+    description: "A stunning moment captured elegantly.",
   },
 ];

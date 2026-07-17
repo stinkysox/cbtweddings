@@ -10,7 +10,6 @@ import Image from "next/image";
 import { siteContent } from "../data/siteContent";
 import { TextReveal } from "../components/TextReveal";
 import { FilmsSection } from "../components/FilmsSection";
-import heroImg from "@/assets/hero-image/cbt-hero.jpg";
 
 export default function Home() {
   const { scrollY } = useScroll();
@@ -25,7 +24,7 @@ export default function Home() {
         {/* Background Image & Overlay */}
         <div className="absolute inset-0 z-0">
           <Image
-            src={heroImg}
+            src="https://i.postimg.cc/Y9K8Gb9V/cbt-hero.jpg"
             alt="CBT Weddings Hero"
             fill
             priority
