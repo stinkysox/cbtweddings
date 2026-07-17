@@ -16,30 +16,28 @@ const CATEGORIES = [
   "Other Events",
 ];
 
+const ExpandIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
+    <path d="M9 3H3v6M15 3h6v6M9 21H3v-6M15 21h6v-6" />
+  </svg>
+);
+
 export default function Gallery() {
   const [filter, setFilter] = useState<string>("All");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [lightboxItem, setLightboxItem] = useState<GalleryItem | null>(null);
   const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
 
-  // Close lightbox on escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setLightboxItem(null);
-      }
+      if (e.key === "Escape") setLightboxItem(null);
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Prevent scrolling when lightbox is open
   useEffect(() => {
-    if (lightboxItem) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
+    document.body.style.overflow = lightboxItem ? "hidden" : "unset";
     return () => {
       document.body.style.overflow = "unset";
     };
@@ -52,31 +50,63 @@ export default function Gallery() {
   return (
     <div className="pt-40 pb-24 px-6 min-h-screen">
       <div className="max-w-7xl mx-auto">
-        {/* Luxury Category Filter Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-wrap justify-center gap-3 md:gap-6 mb-24"
-        >
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => {
-                setFilter(cat);
-                setHoveredId(null);
-              }}
-              className={`px-8 py-3 rounded-full text-[10px] uppercase tracking-[0.4em] font-bold transition-all duration-500 border ${
-                filter === cat
-                  ? "bg-yellow-600 border-yellow-600 text-white shadow-xl shadow-yellow-600/20 scale-105"
-                  : "border-white/5 text-gray-400 hover:text-white hover:border-white/20"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </motion.div>
+        {/* Editorial Header */}
+        <div className="mb-14 md:mb-20 text-center">
+          <span className="text-[10px] tracking-[0.5em] uppercase text-yellow-600/80 font-semibold">
+            The Collection
+          </span>
+          <h1 className="font-serif italic text-4xl md:text-6xl text-white mt-4">
+            Moments, Curated
+          </h1>
+        </div>
 
-        {/* Masonry Grid or Coming Soon State */}
+        {/* Magazine-style Tab Nav */}
+     {/* Magazine-style Index Grid */}
+        <motion.div
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-16 md:mb-24"
+        >
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 border-t border-l border-white/10">
+            {CATEGORIES.map((cat, i) => {
+              const active = filter === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => {
+                    setFilter(cat);
+                    setHoveredId(null);
+                  }}
+                  className="relative border-r border-b border-white/10 px-5 py-6 text-left transition-colors duration-300 group"
+                >
+                  <span
+                    className={`block text-[9px] tracking-[0.3em] mb-2 transition-colors ${
+                      active ? "text-yellow-600" : "text-zinc-600 group-hover:text-zinc-500"
+                    }`}
+                  >
+                    {String(i).padStart(2, "0")}
+                  </span>
+                  <span
+                    className={`block text-[11px] md:text-xs uppercase tracking-[0.25em] transition-colors duration-300 ${
+                      active ? "text-white font-semibold" : "text-zinc-500 group-hover:text-zinc-300"
+                    }`}
+                  >
+                    {cat}
+                  </span>
+
+                  {active && (
+                    <motion.span
+                      layoutId="gallery-tab-dot"
+                      className="absolute bottom-5 right-5 w-1.5 h-1.5 rounded-full bg-yellow-600"
+                      transition={{ type: "spring", stiffness: 400, damping: 35 }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </motion.div>
+        {/* Grid */}
         <div className="relative min-h-[400px]">
           <AnimatePresence mode="wait">
             {filteredItems.length > 0 ? (
@@ -85,9 +115,9 @@ export default function Gallery() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="columns-1 sm:columns-2 lg:columns-3 gap-8 space-y-8"
+                className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6"
               >
-                {filteredItems.map((item) => {
+                {filteredItems.map((item, i) => {
                   const isLoaded = loadedImages[item.id];
                   const isHovered = hoveredId === item.id;
 
@@ -95,21 +125,29 @@ export default function Gallery() {
                     <motion.div
                       key={item.id}
                       layout
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -16 }}
+                      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                       className="break-inside-avoid"
                     >
                       <div
-                        className="group relative overflow-hidden rounded-[2.5rem] glass-light border border-white/5 shadow-sm cursor-pointer"
+                        className="group relative overflow-hidden rounded-sm border border-white/5 cursor-pointer"
                         onClick={() => setLightboxItem(item)}
                         onMouseEnter={() => setHoveredId(item.id)}
                         onMouseLeave={() => setHoveredId(null)}
                       >
                         <div className="relative w-full aspect-[4/5] overflow-hidden bg-zinc-900">
-                          <div className={`absolute inset-0 shimmer transition-opacity duration-700 z-10 ${isLoaded ? 'opacity-0' : 'opacity-100'}`} />
-                          <div className={`relative w-full h-full ${!isLoaded ? 'opacity-0' : 'opacity-100'} transition-opacity duration-1000`}>
+                          <div
+                            className={`absolute inset-0 shimmer transition-opacity duration-700 z-10 ${
+                              isLoaded ? "opacity-0" : "opacity-100"
+                            }`}
+                          />
+                          <div
+                            className={`relative w-full h-full ${
+                              !isLoaded ? "opacity-0" : "opacity-100"
+                            } transition-opacity duration-1000`}
+                          >
                             <Image
                               src={item.imageUrl}
                               alt={item.title}
@@ -117,14 +155,31 @@ export default function Gallery() {
                               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                               priority={GALLERY_DATA.indexOf(item) < 4}
                               className={`object-cover transition-all duration-1000 ${
-                                isHovered ? "brightness-[0.3] blur-[2px] scale-110" : "brightness-100 blur-0 scale-100"
+                                isHovered ? "brightness-[0.35] scale-105" : "brightness-100 scale-100"
                               }`}
                               onLoad={() =>
-                                setLoadedImages((prev) => ({
-                                  ...prev,
-                                  [item.id]: true,
-                                }))
+                                setLoadedImages((prev) => ({ ...prev, [item.id]: true }))
                               }
+                            />
+                          </div>
+
+                          {/* Issue-style index number */}
+                          <span className="absolute top-5 left-5 z-20 font-serif italic text-white/50 text-sm">
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+
+                          {/* Persistent expand cue — visible before hover, for touch users */}
+                          <div
+                            className={`absolute top-5 right-5 z-20 w-9 h-9 rounded-full border flex items-center justify-center backdrop-blur-sm transition-all duration-500 ${
+                              isHovered
+                                ? "border-yellow-600 bg-yellow-600/90 scale-110"
+                                : "border-white/25 bg-black/30"
+                            }`}
+                          >
+                            <ExpandIcon
+                              className={`w-3.5 h-3.5 transition-colors ${
+                                isHovered ? "text-black" : "text-white/80"
+                              }`}
                             />
                           </div>
                         </div>
@@ -133,40 +188,38 @@ export default function Gallery() {
                         <motion.div
                           initial={false}
                           animate={{ opacity: isHovered ? 1 : 0 }}
-                          transition={{ duration: 0.5 }}
-                          className="absolute inset-0 p-10 flex flex-col justify-end pointer-events-none"
+                          transition={{ duration: 0.4 }}
+                          className="absolute inset-0 p-8 flex flex-col justify-end pointer-events-none bg-gradient-to-t from-black/70 via-black/10 to-transparent"
                         >
                           <div className="relative z-10">
                             <motion.p
-                              animate={{ y: isHovered ? 0 : 20 }}
-                              className="text-yellow-600 uppercase text-[9px] tracking-[0.6em] font-bold mb-4"
+                              animate={{ y: isHovered ? 0 : 12 }}
+                              className="text-yellow-600 uppercase text-[9px] tracking-[0.5em] font-bold mb-3"
                             >
                               {item.category}
                             </motion.p>
                             <motion.h3
-                              animate={{ y: isHovered ? 0 : 20 }}
-                              transition={{ delay: 0.05 }}
-                              className="text-3xl md:text-4xl font-serif text-white mb-5 italic leading-tight"
+                              animate={{ y: isHovered ? 0 : 12 }}
+                              transition={{ delay: 0.04 }}
+                              className="text-2xl md:text-3xl font-serif text-white italic leading-tight mb-2"
                             >
                               {item.title}
                             </motion.h3>
                             <motion.p
-                              animate={{ y: isHovered ? 0 : 20 }}
-                              transition={{ delay: 0.1 }}
-                              className="text-white/80 text-[12px] md:text-sm leading-relaxed max-w-[280px] font-light italic"
+                              animate={{ y: isHovered ? 0 : 12 }}
+                              transition={{ delay: 0.08 }}
+                              className="text-white/75 text-[12px] leading-relaxed max-w-[260px] font-light"
                             >
                               {item.description}
                             </motion.p>
                           </div>
                         </motion.div>
-                        <div className="absolute inset-0 ring-1 ring-inset ring-white/10 rounded-[2.5rem] pointer-events-none" />
                       </div>
                     </motion.div>
                   );
                 })}
               </motion.div>
             ) : (
-              /* --- Coming Soon --- */
               <motion.div
                 key="empty"
                 initial={{ opacity: 0, y: 20 }}
@@ -189,7 +242,7 @@ export default function Gallery() {
         </div>
       </div>
 
-      {/* Lightbox Modal */}
+      {/* Lightbox */}
       <AnimatePresence>
         {lightboxItem && (
           <motion.div
@@ -197,10 +250,9 @@ export default function Gallery() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl p-4 md:p-10"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/97 backdrop-blur-xl p-4 md:p-10"
             onClick={() => setLightboxItem(null)}
           >
-            {/* Close Button */}
             <button
               onClick={() => setLightboxItem(null)}
               className="absolute top-6 right-6 md:top-10 md:right-10 z-50 text-white/50 hover:text-white transition-colors p-2"
@@ -212,26 +264,26 @@ export default function Gallery() {
             </button>
 
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              initial={{ opacity: 0, scale: 0.97, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              exit={{ opacity: 0, scale: 0.97, y: 16 }}
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="relative w-full max-w-7xl max-h-[90vh] flex flex-col md:flex-row items-center gap-6 md:gap-16"
-              onClick={(e) => e.stopPropagation()} // Prevent click from closing modal
+              className="relative w-full max-w-7xl max-h-[90vh] flex flex-col md:flex-row items-center gap-8 md:gap-16"
+              onClick={(e) => e.stopPropagation()}
             >
-              {/* Image Container */}
-              <div className="relative w-full md:w-2/3 h-[50vh] md:h-[85vh] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+              {/* Image — no ring, no rounding, no letterbox-highlighting border */}
+              <div className="relative w-full md:w-2/3 h-[50vh] md:h-[85vh]">
                 <Image
                   src={lightboxItem.imageUrl}
                   alt={lightboxItem.title}
                   fill
-                  className="object-contain bg-black/40"
+                  className="object-contain"
                   sizes="100vw"
                   priority
                 />
               </div>
 
-              {/* Text Content */}
+              {/* Text */}
               <div className="w-full md:w-1/3 text-center md:text-left flex flex-col justify-center px-4 md:px-0">
                 <motion.p
                   initial={{ opacity: 0, y: 10 }}
@@ -249,6 +301,7 @@ export default function Gallery() {
                 >
                   {lightboxItem.title}
                 </motion.h3>
+                <div className="w-16 h-px bg-yellow-600/40 mb-6 mx-auto md:mx-0" />
                 <motion.p
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}

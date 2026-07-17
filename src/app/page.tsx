@@ -9,6 +9,7 @@ import { MagneticButton } from "../components/MagneticButton";
 import Image from "next/image";
 import { siteContent } from "../data/siteContent";
 import { TextReveal } from "../components/TextReveal";
+import { FilmsSection } from "../components/FilmsSection";
 import heroImg from "@/assets/hero-image/cbt-hero.jpg";
 
 export default function Home() {
@@ -126,6 +127,11 @@ export default function Home() {
       {/* Bubble Scroll Section */}
       <div className="relative z-10 mb-20">
         <BubbleScroll />
+      </div>
+
+      {/* Films Section */}
+      <div className="relative z-10 bg-gradient-to-b from-transparent via-black/40 to-transparent">
+        <FilmsSection />
       </div>
 
       {/* Why Us Cards */}

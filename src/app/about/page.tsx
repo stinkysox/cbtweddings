@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { SectionWrapper } from "../../components/SectionWrapper";
 import Link from "next/link";
 import { siteContent } from "../../data/siteContent";
+import { TeamSection } from "../../components/TeamSection";
 
 export default function About() {
   const [isImageFocused, setIsImageFocused] = useState(false);
@@ -126,7 +127,7 @@ export default function About() {
       </section>
 
       {/* The Archive Grid */}
-      <section className="max-w-7xl mx-auto px-6 mb-48">
+      <section className="max-w-7xl mx-auto px-6 mb-32 md:mb-48">
         <div className="grid md:grid-cols-2 gap-16 items-center">
           <SectionWrapper direction="left" className="order-2 md:order-1">
             <h2 className="text-4xl md:text-6xl font-serif mb-8 leading-tight italic text-white">
@@ -187,6 +188,11 @@ export default function About() {
           </SectionWrapper>
         </div>
       </section>
+
+      {/* Team Section */}
+      <div className="mb-32 md:mb-48">
+        <TeamSection />
+      </div>
 
       {/* Final CTA */}
       <SectionWrapper className="text-center px-6">

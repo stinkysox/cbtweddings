@@ -1,7 +1,15 @@
 "use client";
 
-import React, { useRef } from "react";
-import { motion, useScroll, useTransform, useSpring, useMotionValue, MotionValue } from "framer-motion";
+import React, { useRef, useMemo } from "react";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useSpring,
+  useMotionValue,
+  useReducedMotion,
+  MotionValue,
+} from "framer-motion";
 
 import bubble1 from "@/assets/wedding-photography/cbt-wedding-celebration-01.webp";
 import bubble2 from "@/assets/engagement-photography/cbt-engagement-candid-02.webp";
@@ -14,57 +22,45 @@ import bubble8 from "@/assets/wedding-photography/cbt-wedding-moments-03.webp";
 
 interface BubbleConfig {
   url: string;
-  size: number;
+  size: number; // desktop max size in px
   x: string;
   y: string;
-  range: [number, number]; // [start, end] of global scroll
+  range: [number, number];
   drift: { x: number; y: number };
+  priority?: boolean; // hide on very small screens to cut load
 }
 
-const Bubble: React.FC<{ config: BubbleConfig; progress: MotionValue<number>; index: number }> = ({
-  config,
-  progress,
-  index,
-}) => {
-  const [mounted, setMounted] = React.useState(false);
-  const [isMobile, setIsMobile] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-    setIsMobile(window.innerWidth < 768);
-  }, []);
-
-  const responsiveSize = (mounted && isMobile) ? config.size * 0.45 : config.size;
-
+const Bubble: React.FC<{
+  config: BubbleConfig;
+  progress: MotionValue<number>;
+  index: number;
+}> = React.memo(({ config, progress, index }) => {
   const start = config.range[0];
   const end = config.range[1];
   const mid = (start + end) / 2;
 
-  // Extremely generous opacity range to ensure we don't have blank screens
+  // Derived directly from the ONE shared smoothed progress value —
+  // no per-bubble springs, so nothing extra to simulate per frame.
   const opacity = useTransform(progress, [start, start + 0.15, end - 0.15, end], [0, 1, 1, 0]);
   const scale = useTransform(progress, [start, mid, end], [0.6, 1.8, 0.6]);
-  
-  // Drift values
-  const driftX = useTransform(progress, [start, end], ["0%", ((mounted && isMobile) ? config.drift.x * 0.2 : config.drift.x) + "%"]);
-  const driftY = useTransform(progress, [start, end], ["0%", ((mounted && isMobile) ? config.drift.y * 0.4 : config.drift.y) + "%"]);
+  const driftX = useTransform(progress, [start, end], ["0%", `${config.drift.x}%`]);
+  const driftY = useTransform(progress, [start, end], ["0%", `${config.drift.y}%`]);
 
-  const springScale = useSpring(scale, { stiffness: 60, damping: 25 });
-  const springX = useSpring(driftX, { stiffness: 45, damping: 20 });
-  const springY = useSpring(driftY, { stiffness: 45, damping: 20 });
-
-  const responsiveLeft = (mounted && isMobile)
-    ? `calc(${config.x} * 0.6 + 20%)`
-    : config.x;
+  // Fluid, CSS-resolved size — no JS mobile detection, no post-mount
+  // resize flash. Scales smoothly between a mobile floor and desktop cap.
+  const floor = config.size * 0.45;
+  const sizeStyle = `clamp(${floor}px, ${(config.size / 1440) * 100}vw, ${config.size}px)`;
 
   return (
     <div
+      className={config.priority ? undefined : "hidden xs:block"}
       style={{
         position: "absolute",
-        left: responsiveLeft,
+        left: `clamp(8%, ${config.x}, 92%)`,
         top: config.y,
-        width: responsiveSize,
-        height: responsiveSize,
-        transform: "translate(-50%, -50%)", // Static centering
+        width: sizeStyle,
+        height: sizeStyle,
+        transform: "translate(-50%, -50%)",
         zIndex: 10 + index,
       }}
     >
@@ -73,25 +69,28 @@ const Bubble: React.FC<{ config: BubbleConfig; progress: MotionValue<number>; in
           width: "100%",
           height: "100%",
           opacity,
-          scale: springScale,
-          x: springX,
-          y: springY,
+          scale,
+          x: driftX,
+          y: driftY,
+          willChange: "transform, opacity",
         }}
-        className="rounded-full overflow-hidden border border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.5)] pointer-events-none will-change-transform"
+        className="rounded-full overflow-hidden border border-white/10 shadow-[0_0_36px_rgba(0,0,0,0.45)] pointer-events-none"
       >
         <img
           src={config.url}
           alt="Wedding moment"
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent to-white/10 pointer-events-none" />
       </motion.div>
     </div>
   );
-};
+});
+Bubble.displayName = "Bubble";
 
 const ScrollIndicator: React.FC<{ progress: MotionValue<number> }> = ({ progress }) => {
-  const [mounted, setMounted] = React.useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -100,16 +99,12 @@ const ScrollIndicator: React.FC<{ progress: MotionValue<number> }> = ({ progress
   const springX = useSpring(x, springConfig);
   const springY = useSpring(y, springConfig);
 
-  React.useEffect(() => setMounted(true), []);
-
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
     const { clientX, clientY } = e;
     const { left, top, width, height } = containerRef.current.getBoundingClientRect();
-    const centerX = left + width / 2;
-    const centerY = top + height / 2;
-    x.set((clientX - centerX) * 0.4);
-    y.set((clientY - centerY) * 0.4);
+    x.set((clientX - (left + width / 2)) * 0.4);
+    y.set((clientY - (top + height / 2)) * 0.4);
   };
 
   const handleMouseLeave = () => {
@@ -120,65 +115,66 @@ const ScrollIndicator: React.FC<{ progress: MotionValue<number> }> = ({ progress
   const opacity = useTransform(progress, [0, 0.05, 0.95, 1], [0, 1, 1, 0]);
   const rotate = useTransform(progress, [0, 1], [0, 360]);
 
-  if (!mounted) return null;
-
   return (
     <motion.div
       style={{ opacity }}
       className="absolute bottom-12 right-12 md:right-24 z-50 flex flex-col items-center gap-4 pointer-events-auto"
     >
+      {/* Magnetic mouse-follow only makes sense with a cursor — desktop only */}
       <div
         ref={containerRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="relative w-20 h-20 flex items-center justify-center cursor-pointer group"
+        className="relative w-20 h-20 hidden md:flex items-center justify-center cursor-pointer group"
       >
         <motion.div
           style={{ x: springX, y: springY }}
           className="relative w-full h-full flex items-center justify-center"
         >
-          {/* Progress Ring */}
           <svg className="w-full h-full -rotate-90">
-            <circle
-              cx="40"
-              cy="40"
-              r="36"
-              fill="none"
-              stroke="white"
-              strokeWidth="0.5"
-              className="opacity-10"
-            />
+            <circle cx="40" cy="40" r="36" fill="none" stroke="white" strokeWidth="0.5" className="opacity-10" />
             <motion.circle
               cx="40"
               cy="40"
               r="36"
               fill="none"
-              stroke="#ca8a04" // yellow-600
+              stroke="#ca8a04"
               strokeWidth="1.5"
               strokeDasharray="226"
-              style={{
-                pathLength: progress,
-              }}
-              className="transition-all duration-300"
+              style={{ pathLength: progress }}
             />
           </svg>
-
-          {/* Pulsing Core */}
           <div className="absolute inset-0 flex items-center justify-center">
-             <div className="w-1.5 h-1.5 bg-yellow-600 rounded-full shadow-[0_0_12px_rgba(202,138,4,0.6)] animate-pulse" />
+            <div className="w-1.5 h-1.5 bg-yellow-600 rounded-full shadow-[0_0_12px_rgba(202,138,4,0.6)] animate-pulse" />
           </div>
-
-          {/* Magnetic text label */}
-          <motion.div 
+          <motion.div
             style={{ rotate }}
-            className="absolute inset-0 rounded-full border border-dashed border-white/5 group-hover:border-yellow-600/20 transition-colors" 
+            className="absolute inset-0 rounded-full border border-dashed border-white/5 group-hover:border-yellow-600/20 transition-colors"
           />
         </motion.div>
       </div>
 
+      {/* Static, cheap fallback ring for touch devices */}
+      <div className="md:hidden relative w-14 h-14 flex items-center justify-center">
+        <svg className="w-full h-full -rotate-90">
+          <circle cx="28" cy="28" r="24" fill="none" stroke="white" strokeWidth="0.5" className="opacity-10" />
+          <motion.circle
+            cx="28"
+            cy="28"
+            r="24"
+            fill="none"
+            stroke="#ca8a04"
+            strokeWidth="1.5"
+            strokeDasharray="151"
+            style={{ pathLength: progress }}
+          />
+        </svg>
+        <div className="absolute w-1.5 h-1.5 bg-yellow-600 rounded-full shadow-[0_0_12px_rgba(202,138,4,0.6)] animate-pulse" />
+      </div>
+
       <div className="flex flex-col items-center gap-1.5">
-         <span className="text-[9px] uppercase tracking-[0.5em] font-bold text-yellow-600/70">Scroll</span>
-         <div className="w-px h-6 bg-gradient-to-b from-yellow-600/60 to-transparent" />
+        <span className="text-[9px] uppercase tracking-[0.5em] font-bold text-yellow-600/70">Scroll</span>
+        <div className="w-px h-6 bg-gradient-to-b from-yellow-600/60 to-transparent" />
       </div>
     </motion.div>
   );
@@ -186,99 +182,68 @@ const ScrollIndicator: React.FC<{ progress: MotionValue<number> }> = ({ progress
 
 export const BubbleScroll: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
   });
 
-  // Balanced, overlapping ranges to ensure no blank zones
-  const bubbles: BubbleConfig[] = [
-    {
-      url: bubble1.src,
-      size: 500,
-      x: "15%",
-      y: "30%",
-      range: [0, 0.4],
-      drift: { x: 50, y: -80 },
-    },
-    {
-      url: bubble2.src,
-      size: 350,
-      x: "70%",
-      y: "25%",
-      range: [0.1, 0.5],
-      drift: { x: -40, y: -60 },
-    },
-    {
-      url: bubble3.src,
-      size: 420,
-      x: "30%",
-      y: "60%",
-      range: [0.25, 0.65],
-      drift: { x: 60, y: -100 },
-    },
-    {
-      url: bubble4.src,
-      size: 280,
-      x: "80%",
-      y: "45%",
-      range: [0.35, 0.75],
-      drift: { x: -80, y: -70 },
-    },
-    {
-      url: bubble5.src,
-      size: 480,
-      x: "10%",
-      y: "50%",
-      range: [0.5, 0.85],
-      drift: { x: 100, y: -90 },
-    },
-    {
-      url: bubble6.src,
-      size: 380,
-      x: "65%",
-      y: "70%",
-      range: [0.6, 0.95],
-      drift: { x: -30, y: -120 },
-    },
-    {
-      url: bubble7.src,
-      size: 400,
-      x: "25%",
-      y: "75%",
-      range: [0.75, 1.0],
-      drift: { x: 40, y: -90 },
-    },
-    {
-      url: bubble8.src,
-      size: 520,
-      x: "60%",
-      y: "20%",
-      range: [0.8, 1.0],
-      drift: { x: -60, y: -150 },
-    },
-  ];
+  // ONE spring smooths the whole sequence instead of 24 separate ones —
+  // this is the main fix. Every bubble reads off this single value.
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    mass: 0.5,
+  });
+
+  const progress = prefersReducedMotion ? scrollYProgress : smoothProgress;
+
+  const bubbles: BubbleConfig[] = useMemo(
+    () => [
+      { url: bubble1.src, size: 500, x: "15%", y: "30%", range: [0, 0.4], drift: { x: 50, y: -80 }, priority: true },
+      { url: bubble2.src, size: 350, x: "70%", y: "25%", range: [0.1, 0.5], drift: { x: -40, y: -60 }, priority: true },
+      { url: bubble3.src, size: 420, x: "30%", y: "60%", range: [0.25, 0.65], drift: { x: 60, y: -100 }, priority: true },
+      { url: bubble4.src, size: 280, x: "80%", y: "45%", range: [0.35, 0.75], drift: { x: -80, y: -70 } },
+      { url: bubble5.src, size: 480, x: "10%", y: "50%", range: [0.5, 0.85], drift: { x: 100, y: -90 }, priority: true },
+      { url: bubble6.src, size: 380, x: "65%", y: "70%", range: [0.6, 0.95], drift: { x: -30, y: -120 } },
+      { url: bubble7.src, size: 400, x: "25%", y: "75%", range: [0.75, 1.0], drift: { x: 40, y: -90 }, priority: true },
+      { url: bubble8.src, size: 520, x: "60%", y: "20%", range: [0.8, 1.0], drift: { x: -60, y: -150 } },
+    ],
+    []
+  );
+
+  // Respect reduced-motion users entirely — no parallax, just a static collage.
+  if (prefersReducedMotion) {
+    return (
+      <section className="relative py-24 bg-transparent">
+        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 px-6">
+          {bubbles.map((b, i) => (
+            <div key={i} className="aspect-square rounded-full overflow-hidden border border-white/10">
+              <img src={b.url} alt="Wedding moment" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section ref={containerRef} className="relative h-[800vh] bg-transparent">
-      {/* Sticky Tracker */}
       <div className="sticky top-0 h-screen w-full overflow-hidden pointer-events-none">
-        {/* Visual Watermark for Debugging & Aesthetic */}
         <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none">
           <h2 className="text-[20vw] font-serif uppercase tracking-tighter leading-none dark:text-white text-black text-center select-none italic">
             Archive
           </h2>
         </div>
 
-        {/* Bubbles Render */}
         <div className="relative h-full w-full">
           {bubbles.map((bubble, i) => (
-            <Bubble key={i} config={bubble} progress={scrollYProgress} index={i} />
+            <Bubble key={i} config={bubble} progress={progress} index={i} />
           ))}
         </div>
 
-        {/* Interactive Scroll Indicator */}
-        <ScrollIndicator progress={scrollYProgress} />
+        <ScrollIndicator progress={progress} />
       </div>
     </section>
   );
