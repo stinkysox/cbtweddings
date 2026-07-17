@@ -9,7 +9,7 @@ import { MagneticButton } from "../components/MagneticButton";
 import Image from "next/image";
 import { siteContent } from "../data/siteContent";
 import { TextReveal } from "../components/TextReveal";
-import heroImg from "@/assets/wedding-photography/cbt-wedding-ceremony-01.webp";
+import heroImg from "@/assets/hero-image/cbt-hero.jpg";
 
 export default function Home() {
   const { scrollY } = useScroll();
