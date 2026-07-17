@@ -58,7 +58,6 @@ const slideVariants = {
 
 export default function Gallery() {
   const [filter, setFilter] = useState<string>("All");
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [direction, setDirection] = useState(0);
   const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
@@ -158,7 +157,6 @@ export default function Gallery() {
                   key={cat}
                   onClick={() => {
                     setFilter(cat);
-                    setHoveredId(null);
                   }}
                   className="relative border-r border-b border-white/10 px-5 py-6 text-left transition-colors duration-300 group"
                 >
@@ -203,7 +201,6 @@ export default function Gallery() {
               >
                 {filteredItems.map((item, i) => {
                   const isLoaded = loadedImages[item.id];
-                  const isHovered = hoveredId === item.id;
 
                   return (
                     <motion.div
@@ -221,8 +218,6 @@ export default function Gallery() {
                           setDirection(0);
                           setLightboxIndex(i);
                         }}
-                        onMouseEnter={() => setHoveredId(item.id)}
-                        onMouseLeave={() => setHoveredId(null)}
                       >
                         <div className="relative w-full aspect-[4/5] overflow-hidden bg-zinc-900">
                           <div
@@ -241,9 +236,7 @@ export default function Gallery() {
                               fill
                               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                               priority={GALLERY_DATA.indexOf(item) < 4}
-                              className={`object-cover transition-all duration-1000 ${
-                                isHovered ? "brightness-[0.35] scale-105" : "brightness-100 scale-100"
-                              }`}
+                              className="object-cover transition-all duration-700 ease-out brightness-100 scale-100 group-hover:brightness-[0.35] group-hover:scale-105 will-change-transform"
                               onLoad={() =>
                                 setLoadedImages((prev) => ({ ...prev, [item.id]: true }))
                               }
@@ -256,51 +249,25 @@ export default function Gallery() {
                           </span>
 
                           {/* Persistent expand cue — visible before hover, for touch users */}
-                          <div
-                            className={`absolute top-5 right-5 z-20 w-9 h-9 rounded-full border flex items-center justify-center backdrop-blur-sm transition-all duration-500 ${
-                              isHovered
-                                ? "border-yellow-600 bg-yellow-600/90 scale-110"
-                                : "border-white/25 bg-black/30"
-                            }`}
-                          >
-                            <ExpandIcon
-                              className={`w-3.5 h-3.5 transition-colors ${
-                                isHovered ? "text-black" : "text-white/80"
-                              }`}
-                            />
+                          <div className="absolute top-5 right-5 z-20 w-9 h-9 rounded-full border flex items-center justify-center backdrop-blur-sm transition-all duration-500 border-white/25 bg-black/30 group-hover:border-yellow-600 group-hover:bg-yellow-600/90 group-hover:scale-110">
+                            <ExpandIcon className="w-3.5 h-3.5 transition-colors text-white/80 group-hover:text-black" />
                           </div>
                         </div>
 
                         {/* Hover Overlay Text */}
-                        <motion.div
-                          initial={false}
-                          animate={{ opacity: isHovered ? 1 : 0 }}
-                          transition={{ duration: 0.4 }}
-                          className="absolute inset-0 p-8 flex flex-col justify-end pointer-events-none bg-gradient-to-t from-black/70 via-black/10 to-transparent"
-                        >
-                          <div className="relative z-10">
-                            <motion.p
-                              animate={{ y: isHovered ? 0 : 12 }}
-                              className="text-yellow-600 uppercase text-[9px] tracking-[0.5em] font-bold mb-3"
-                            >
+                        <div className="absolute inset-0 p-8 flex flex-col justify-end pointer-events-none bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out">
+                          <div className="relative z-10 translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-out">
+                            <p className="text-yellow-600 uppercase text-[9px] tracking-[0.5em] font-bold mb-3 transition-transform duration-500 ease-out group-hover:translate-y-0 translate-y-2">
                               {item.category}
-                            </motion.p>
-                            <motion.h3
-                              animate={{ y: isHovered ? 0 : 12 }}
-                              transition={{ delay: 0.04 }}
-                              className="text-2xl md:text-3xl font-serif text-white italic leading-tight mb-2"
-                            >
+                            </p>
+                            <h3 className="text-2xl md:text-3xl font-serif text-white italic leading-tight mb-2 transition-transform duration-500 delay-75 ease-out group-hover:translate-y-0 translate-y-2">
                               {item.title}
-                            </motion.h3>
-                            <motion.p
-                              animate={{ y: isHovered ? 0 : 12 }}
-                              transition={{ delay: 0.08 }}
-                              className="text-white/75 text-[12px] leading-relaxed max-w-[260px] font-light"
-                            >
+                            </h3>
+                            <p className="text-white/75 text-[12px] leading-relaxed max-w-[260px] font-light transition-transform duration-500 delay-100 ease-out group-hover:translate-y-0 translate-y-2">
                               {item.description}
-                            </motion.p>
+                            </p>
                           </div>
-                        </motion.div>
+                        </div>
                       </div>
                     </motion.div>
                   );

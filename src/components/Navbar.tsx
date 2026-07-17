@@ -153,7 +153,7 @@ export const Navbar: React.FC = () => {
                 initial={{ opacity: 0, x: 24, rotate: -6 }}
                 animate={{ opacity: 0.95, x: 0, rotate: -6 }}
                 transition={{ delay: 0.35, duration: 0.7, ease: "easeOut" }}
-                src="https://placehold.co/220x300/1a1a1a/8a6d3b?text=%20"
+                src="https://i.postimg.cc/Cxc47wKz/MAN00827.jpg"
                 alt=""
                 className="w-24 sm:w-28 aspect-[3/4] object-cover border border-white/20 shadow-2xl backdrop-blur-sm"
               />
@@ -161,7 +161,7 @@ export const Navbar: React.FC = () => {
                 initial={{ opacity: 0, x: 24, rotate: 5 }}
                 animate={{ opacity: 0.95, x: 0, rotate: 5 }}
                 transition={{ delay: 0.5, duration: 0.7, ease: "easeOut" }}
-                src="https://placehold.co/220x300/1a1a1a/8a6d3b?text=%20"
+                src="https://i.postimg.cc/4xf5pYXR/MAV01405.jpg"
                 alt=""
                 className="w-24 sm:w-28 aspect-[3/4] object-cover border border-white/20 shadow-2xl mr-10 backdrop-blur-sm"
               />

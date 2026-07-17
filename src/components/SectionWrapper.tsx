@@ -41,6 +41,7 @@ export const SectionWrapper: React.FC<SectionWrapperProps> = ({
       viewport={{ once: true, margin: "-100px" }}
       variants={variants}
       className={className}
+      style={{ willChange: "transform, opacity" }}
     >
       {children}
     </motion.div>

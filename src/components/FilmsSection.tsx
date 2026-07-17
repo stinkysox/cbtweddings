@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { SectionWrapper } from "./SectionWrapper";
 
 interface Film {
@@ -10,57 +10,109 @@ interface Film {
   youtubeId: string;
 }
 
-// Placeholder data - user can replace these IDs with their actual YouTube IDs
 const FILMS: Film[] = [
-  {
+ {
     id: "1",
     title: "A Symphony of Vows",
     description: "A breathtaking cinematic journey capturing the intimate moments before the altar, set against a stunning heritage backdrop.",
-    youtubeId: "dQw4w9WgXcQ", // Example placeholder ID
+    youtubeId: "UehmdFwDwfI",
   },
   {
     id: "2",
     title: "Midnight Whispers",
     description: "An editorial deep dive into an ethereal night-time engagement, where every frame speaks of pure, unscripted romance.",
-    youtubeId: "dQw4w9WgXcQ",
+    youtubeId: "w3sWdahfuLw",
   },
   {
     id: "3",
     title: "The Tuscan Sun",
     description: "A destination celebration that blends high fashion with raw, emotional storytelling under the golden Italian sun.",
-    youtubeId: "dQw4w9WgXcQ",
+    youtubeId: "8l_QtCsFrko",
   },
   {
     id: "4",
     title: "Heirloom Elegance",
     description: "Honoring cultural rituals through a modern, luxurious lens. A timeless record of two families becoming one.",
-    youtubeId: "dQw4w9WgXcQ",
+    youtubeId: "OHxWcPc6c44",
   },
   {
     id: "5",
     title: "Ocean's Embrace",
     description: "A coastal elopement defined by sweeping cinematic drone shots and deeply personal exchanged vows.",
-    youtubeId: "dQw4w9WgXcQ",
+    youtubeId: "LoyDZOoLPOs",
   },
   {
     id: "6",
     title: "Urban Opulence",
     description: "A sophisticated city wedding set in a historic museum, capturing architectural grandeur and avant-garde style.",
-    youtubeId: "dQw4w9WgXcQ",
+    youtubeId: "Jy0oDr1hzXg",
   },
   {
     id: "7",
     title: "The Secret Garden",
     description: "Lush botanicals and soft lighting frame this romantic, highly curated garden ceremony.",
-    youtubeId: "dQw4w9WgXcQ",
-  },
-  {
-    id: "8",
-    title: "Eternal Glow",
-    description: "The culmination of a weekend-long celebration, culminating in a spectacular fireworks display and a night of wild, cinematic dancing.",
-    youtubeId: "dQw4w9WgXcQ",
+    youtubeId: "h9Et_AiE6l0",
   },
 ];
+
+// Extracted individual Film Player card to manage play state cleanly
+const FilmPlayer = ({ film, isEven }: { film: Film; isEven: boolean }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  // Fallback to high-res YouTube thumbnail string automatically
+  const thumbnailUrl = `https://img.youtube.com/vi/${film.youtubeId}/maxresdefault.jpg`;
+
+  return (
+    <SectionWrapper
+      direction={isEven ? "right" : "left"}
+      className="w-full md:w-3/5"
+    >
+      <div className="relative w-full aspect-video rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl bg-zinc-950 border border-white/5 ring-1 ring-white/10 group cursor-pointer">
+        {!isPlaying ? (
+          <div 
+            className="absolute inset-0 w-full h-full z-20 flex items-center justify-center"
+            onClick={() => setIsPlaying(true)}
+          >
+            {/* Background Thumbnail Image with subtle hover scale */}
+            <img
+              src={thumbnailUrl}
+              alt={`${film.title} Cinematic Thumbnail`}
+              className="absolute inset-0 w-full h-full object-cover opacity-60 transition-transform duration-[1.5s] ease-out group-hover:scale-105"
+              loading="lazy"
+            />
+            
+            {/* Premium, Minimalist Custom Play Overlay */}
+            <div className="relative z-30 flex items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full bg-black/20 backdrop-blur-md border border-white/20 transition-all duration-500 ease-out group-hover:bg-white group-hover:border-white shadow-xl group-hover:scale-110">
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                viewBox="0 0 24 24" 
+                fill="currentColor" 
+                className="w-6 h-6 md:w-8 md:h-8 text-white transition-colors duration-500 ease-out group-hover:text-black translate-x-[2px]"
+              >
+                <path fillRule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clipRule="evenodd" />
+              </svg>
+            </div>
+
+            {/* Ambient luxury linear shading top/bottom */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20 pointer-events-none z-20" />
+          </div>
+        ) : (
+          <iframe
+            className="relative z-10 w-full h-full object-cover"
+            src={`https://www.youtube.com/embed/${film.youtubeId}?autoplay=1&rel=0&modestbranding=1&color=white`}
+            title={film.title}
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        )}
+        
+        {/* Decorative inner border frame */}
+        <div className="absolute inset-0 z-40 pointer-events-none ring-1 ring-inset ring-white/10 rounded-[2rem] md:rounded-[3rem]" />
+      </div>
+    </SectionWrapper>
+  );
+};
 
 export const FilmsSection = () => {
   return (
@@ -89,29 +141,8 @@ export const FilmsSection = () => {
                 isEven ? "md:flex-row" : "md:flex-row-reverse"
               } items-center gap-12 md:gap-24`}
             >
-              {/* Video Player */}
-              <SectionWrapper
-                direction={isEven ? "right" : "left"}
-                className="w-full md:w-3/5"
-              >
-                <div className="relative w-full aspect-video rounded-[2rem] md:rounded-[3rem] overflow-hidden shadow-2xl glass-light border border-white/5 ring-1 ring-white/10 group">
-                  {/* Subtle pulsing background while loading */}
-                  <div className="absolute inset-0 bg-zinc-900 animate-pulse" />
-                  
-                  <iframe
-                    className="relative z-10 w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-[1.02]"
-                    src={`https://www.youtube.com/embed/${film.youtubeId}?rel=0&modestbranding=1&color=white`}
-                    title={film.title}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    loading="lazy"
-                  />
-                  
-                  {/* Gradient Overlay for luxury feel (doesn't block clicks because pointer-events-none) */}
-                  <div className="absolute inset-0 z-20 pointer-events-none ring-1 ring-inset ring-white/10 rounded-[2rem] md:rounded-[3rem]" />
-                </div>
-              </SectionWrapper>
+              {/* Refactored Interactive Video Player */}
+              <FilmPlayer film={film} isEven={isEven} />
 
               {/* Text Content */}
               <SectionWrapper

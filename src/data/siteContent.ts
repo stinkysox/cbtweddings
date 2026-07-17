@@ -1,4 +1,3 @@
-
 export const siteContent = {
   brand: {
     name: "CBT Weddings",
@@ -11,6 +10,7 @@ export const siteContent = {
       { name: "Gallery", path: "/gallery" },
       { name: "Testimonials", path: "/testimonials" },
       { name: "Contact", path: "/contact" },
+      { name: "Wedding", path: "/wedding" },
     ],
     cta: {
       text: "Book Now",
@@ -46,6 +46,55 @@ export const siteContent = {
       {
         title: "Unforced Emotion",
         desc: "Tuning in to the silent, unseen moments—the faint glances and subtle breaths that hold the true weight of your story.",
+      },
+    ],
+    filmsSection: {
+      label: "CINEMATIC ARCHIVE",
+      title: "Our Films",
+      description: "Experience the motion and emotion. Our cinematic approach blends documentary storytelling with high-fashion aesthetics.",
+    },
+    films: [
+      {
+        id: "01",
+        title: "Ethereal Legacies",
+        videoUrl: "https://youtu.be/UehmdFwDwfI",
+        embedId: "UehmdFwDwfI",
+      },
+      {
+        id: "02",
+        title: "Whispers of Twilight",
+        videoUrl: "https://youtu.be/w3sWdahfuLw",
+        embedId: "w3sWdahfuLw",
+      },
+      {
+        id: "03",
+        title: "The Silent Symphony",
+        videoUrl: "https://youtu.be/8l_QtCsFrko",
+        embedId: "8l_QtCsFrko",
+      },
+      {
+        id: "04",
+        title: "Timeless Echoes",
+        videoUrl: "https://youtu.be/OHxWcPc6c44",
+        embedId: "OHxWcPc6c44",
+      },
+      {
+        id: "05",
+        title: "Poetic Solitude",
+        videoUrl: "https://youtu.be/LoyDZOoLPOs",
+        embedId: "LoyDZOoLPOs",
+      },
+      {
+        id: "06",
+        title: "Fragments of Forever",
+        videoUrl: "https://youtu.be/Jy0oDr1hzXg",
+        embedId: "Jy0oDr1hzXg",
+      },
+      {
+        id: "07",
+        title: "The Golden Hour",
+        videoUrl: "https://youtu.be/h9Et_AiE6l0",
+        embedId: "h9Et_AiE6l0",
       },
     ],
     finalCta: {
@@ -206,5 +255,5 @@ export const siteContent = {
     },
     copyright: "CBT Weddings Artistry Archive. All Visual Content Protected.",
     legacies: "Legacies Crafted Globally. Headquartered in Hyderabad, India.",
-  },
+  }, 
 };
