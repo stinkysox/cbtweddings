@@ -74,7 +74,7 @@ export const HorizontalGallery: React.FC<HorizontalGalleryProps> = ({ items = DE
   const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   return (
-    <section ref={targetRef} style={{ height: scrollHeight }} className="relative bg-transparent">
+    <section ref={targetRef} style={{ height: scrollHeight, position: "relative" }} className="relative bg-transparent">
       <div className="sticky top-0 h-screen flex flex-col items-center justify-center overflow-hidden">
         {/* Scroll Interaction Hint */}
         <motion.div 

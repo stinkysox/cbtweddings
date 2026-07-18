@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "../components/Navbar";
@@ -16,46 +16,47 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://weddingwit.vercel.app'),
-  title: "Weddingwit | Luxury Wedding Storytelling",
-  description: "Weddingwit | Luxury Wedding Photography & Cinematic Storytelling in Hyderabad. Capturing timeless wedding moments with artistic elegance globally.",
-  keywords: "wedding photography Hyderabad, luxury wedding photographer, cinematic wedding films, destination wedding photographer India, premium wedding stories",
-  authors: [{ name: "Weddingwit Artistry Archive" }],
+  metadataBase: new URL('https://www.cbtweddings.com'),
+  title: "CBT Weddings | Luxury Wedding Storytelling",
+  description: "CBT Weddings | Luxury Wedding Photography & Cinematic Storytelling. Capturing timeless wedding moments with artistic elegance globally.",
+  keywords: "wedding photography, luxury wedding photographer, cinematic wedding films, destination wedding photographer, premium wedding stories",
+  authors: [{ name: "CBT Weddings Artistry Archive" }],
   robots: "index, follow",
   verification: {
     google: "b0fe91c686917fde",
   },
   alternates: {
-    canonical: "https://weddingwit.vercel.app",
+    canonical: "https://www.cbtweddings.com",
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-  },
-  themeColor: '#EAB308',
   manifest: '/manifest.json',
   openGraph: {
-    title: "Weddingwit | Luxury Wedding Storytelling",
-    description: "Weddingwit captures your luxury wedding moments with artistic storytelling and premium photography in Hyderabad and globally.",
+    title: "CBT Weddings | Luxury Wedding Storytelling",
+    description: "CBT Weddings captures your luxury wedding moments with artistic storytelling and premium photography globally.",
     type: "website",
-    url: "https://weddingwit.vercel.app",
-    siteName: "Weddingwit",
+    url: "https://www.cbtweddings.com",
+    siteName: "CBT Weddings",
     images: [
       {
-        url: "https://i.pinimg.com/736x/a9/9a/d5/a99ad5c52f71c7d54a4d21d724d2e079.jpg",
+        url: "https://i.postimg.cc/DZZdHH81/behance-img-13.jpg",
         width: 1200,
         height: 630,
-        alt: "Weddingwit Luxury Photography",
+        alt: "CBT Weddings Luxury Photography",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Weddingwit | Luxury Wedding Storytelling",
-    description: "Weddingwit captures your luxury wedding moments with artistic storytelling and premium photography.",
-    images: ["https://i.pinimg.com/736x/a9/9a/d5/a99ad5c52f71c7d54a4d21d724d2e079.jpg"],
+    title: "CBT Weddings | Luxury Wedding Storytelling",
+    description: "CBT Weddings captures your luxury wedding moments with artistic storytelling and premium photography.",
+    images: ["https://i.postimg.cc/DZZdHH81/behance-img-13.jpg"],
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#EAB308',
 };
 
 import { CustomCursor } from "../components/CustomCursor";
@@ -70,23 +71,22 @@ export default function RootLayout({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
-    "name": "Weddingwit",
-    "image": "https://i.pinimg.com/736x/a9/9a/d5/a99ad5c52f71c7d54a4d21d724d2e079.jpg",
-    "@id": "https://weddingwit.vercel.app",
-    "url": "https://weddingwit.vercel.app",
-    "telephone": "+914045678910",
+    "name": "CBT Weddings",
+    "image": "https://i.postimg.cc/DZZdHH81/behance-img-13.jpg",
+    "@id": "https://www.cbtweddings.com",
+    "url": "https://www.cbtweddings.com",
+    "telephone": "+918800180670",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "Jubilee Hills",
-      "addressLocality": "Hyderabad",
-      "addressRegion": "Telangana",
-      "postalCode": "500033",
+      "streetAddress": "B-66, First Floor, New Rajinder Nagar",
+      "addressLocality": "New Delhi",
+      "postalCode": "110060",
       "addressCountry": "IN"
     },
     "geo": {
       "@type": "GeoCoordinates",
-      "latitude": 17.43,
-      "longitude": 78.40
+      "latitude": 28.6389,
+      "longitude": 77.1818
     },
     "openingHoursSpecification": {
       "@type": "OpeningHoursSpecification",
@@ -97,14 +97,14 @@ export default function RootLayout({
       "closes": "20:00"
     },
     "sameAs": [
-      "https://instagram.com/weddingwit",
-      "https://youtube.com/weddingwit",
-      "https://pinterest.com/weddingwit"
+      "https://www.instagram.com/creativitybeyondthoughts/",
+      "https://youtube.com",
+      "https://pinterest.com"
     ]
   };
 
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" className="dark" suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
         <script
           type="application/ld+json"

@@ -6,29 +6,35 @@ import { SectionWrapper } from "../../components/SectionWrapper";
 import Link from "next/link";
 import { siteContent } from "../../data/siteContent";
 import { TeamSection } from "../../components/TeamSection";
+import Aurora from "../../components/Aurora";
+
 export default function About() {
   const [isImageFocused, setIsImageFocused] = useState(false);
   const { about } = siteContent;
 
   return (
-    <div className="pt-32 pb-24 overflow-hidden">
-      {/* Hero Section */}
-      <SectionWrapper className="max-w-5xl mx-auto px-6 text-center mb-32">
-        <motion.span
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="premium-label mb-6 block"
-        >
-          {about.hero.label}
-        </motion.span>
-        <h1 className="text-6xl md:text-9xl font-serif mb-10 leading-[0.85] tracking-tighter text-white">
-          {about.hero.title} <br />
-          <span className="italic">{about.hero.titleAccent}</span>
-        </h1>
-        <p className="premium-para text-xl md:text-2xl max-w-3xl mx-auto italic font-medium !text-zinc-300">
-          {about.hero.description}
-        </p>
-      </SectionWrapper>
+    <div className="pt-8 md:pt-12 pb-24 overflow-hidden relative">
+      {/* Hero Section - Matching Home/Films implementation */}
+      <div className="relative mx-4 md:mx-6 mb-32 flex min-h-[600px] md:min-h-[700px] flex-col items-center justify-center overflow-hidden rounded-[3rem] bg-black md:rounded-[4rem] shadow-2xl">
+        <Aurora colorA="#eab308" colorB="#ca8a04" intensity={0.8} speed={1.2} blur={40} />
+        
+        <SectionWrapper className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+          <motion.span
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="premium-label mb-6 block text-yellow-600 font-bold"
+          >
+            {about.hero.label}
+          </motion.span>
+          <h1 className="text-6xl md:text-9xl font-serif mb-10 leading-[0.85] tracking-tighter text-white">
+            {about.hero.title} <br />
+            <span className="italic">{about.hero.titleAccent}</span>
+          </h1>
+          <p className="premium-para text-xl md:text-2xl max-w-3xl mx-auto italic font-medium !text-white/80">
+            {about.hero.description}
+          </p>
+        </SectionWrapper>
+      </div>
 
       {/* Philosophy Section */}
       <section className="max-w-7xl mx-auto px-6 mb-48">
@@ -36,8 +42,6 @@ export default function About() {
           <SectionWrapper direction="left">
             <motion.div
               onClick={() => setIsImageFocused(!isImageFocused)}
-              onMouseEnter={() => setIsImageFocused(true)}
-              onMouseLeave={() => setIsImageFocused(false)}
               className="aspect-[3/4] rounded-[3rem] overflow-hidden shadow-2xl relative cursor-pointer"
             >
               <motion.img

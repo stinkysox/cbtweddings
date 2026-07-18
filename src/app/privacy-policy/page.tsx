@@ -18,7 +18,7 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-2xl font-serif text-gray-900 dark:text-white mb-4">1. Introduction</h2>
             <p>
-              At Weddingwit, we value your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, use, and safeguard your information when you visit our website and use our services.
+              At CBT Weddings, we value your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, use, and safeguard your information when you visit our website and use our services.
             </p>
           </section>
 
@@ -54,9 +54,9 @@ export default function PrivacyPolicy() {
             <p>
               If you have any questions about this Privacy Policy, please contact us at:
               <br />
-              <strong>Email:</strong> archives@weddingwit.com
+              <strong>Email:</strong> archives@cbtweddings.com
               <br />
-              <strong>Location:</strong> Jubilee Hills, Hyderabad
+              <strong>Location:</strong> New Rajinder Nagar, New Delhi
             </p>
           </section>
         </div>

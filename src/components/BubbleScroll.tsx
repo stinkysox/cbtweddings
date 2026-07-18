@@ -15,10 +15,10 @@ import { GALLERY_DATA } from "@/data/gallery";
 interface BubbleConfig {
   url: string;
   size: number; // desktop max size in px
-  x: string;
-  y: string;
+  x: number; // target x position in % (viewport width)
+  y: number; // target y position in % (viewport height)
   range: [number, number];
-  drift: { x: number; y: number };
+  drift: { x: number; y: number }; // in vw/vh units, applied as a transform
   priority?: boolean; // hide on very small screens to cut load
 }
 
@@ -33,35 +33,70 @@ const Bubble: React.FC<{
   const riseEnd = Math.min(start + 0.2, end);
 
   const opacity = useTransform(progress, [start, riseEnd, end - 0.15, end], [0, 1, 1, 0]);
-  const scale = useTransform(progress, [start, mid, end], [0.7, 1.15, 0.7]);
-  const driftX = useTransform(progress, [start, end], ["0%", `${config.drift.x}%`]);
-  const driftY = useTransform(
-    progress,
-    [start, riseEnd, end],
-    ["140%", "0%", `${config.drift.y}%`]
-  );
+  const scale = useTransform(progress, [start, riseEnd, mid, end], [0.55, 1.05, 1.2, 0.8]);
+  const rotate = useTransform(progress, [start, mid, end], [config.drift.x > 0 ? -5 : 5, 0, config.drift.x > 0 ? 5 : -5]);
 
-  // FIX: floor was size * 0.3, which pushed most bubbles down to ~130-230px
-  // on a typical ~390px-wide phone — too small to register as a real
-  // visual element (per screenshot). Bumped to size * 0.55 so bubbles read
-  // clearly on mobile, and switched the responsive term from a fixed
-  // 1440px basis to 45vw, so sizing tracks the actual viewport instead of
-  // one fixed floor number — bigger phones (e.g. tablets in portrait) get
-  // slightly larger bubbles than small phones, rather than everything
-  // pinning to the same floor value.
-  const floor = config.size * 0.55;
-  const sizeStyle = `clamp(${floor}px, 45vw, ${config.size}px)`;
+  // PERFORMANCE FIX: everything below is a single derived MotionValue per axis,
+  // computed with a plain function instead of chaining useTransform -> useTransform
+  // -> template string. It outputs ONE "transform: translate()" value, so the
+  // browser only ever composites — it never has to re-run layout. This is what
+  // kills the scroll jitter: the previous version animated `left`/`top` (layout
+  // properties) every frame, which is expensive and was the actual cause of the
+  // stutter, not the spring config.
+  //
+  // The bubble's outer wrapper is placed at its final target position (x%, y%)
+  // statically (see JSX below) — never animated. To get the "bursts out from
+  // center" effect without moving that layout position, we instead translate
+  // the element by "distance from center to target" (in vw/vh, so it scales
+  // with the viewport) at start, animating that distance down to 0 by riseEnd.
+  // A bit of continuous drift (also in vw/vh) is layered on top of the same
+  // value so it keeps drifting after it arrives.
+  const centerToTargetX = 50 - config.x; // vw units needed to reach center from target
+  const centerToTargetY = 50 - config.y; // vh units
+
+  const translateX = useTransform(progress, (p) => {
+    let offset: number;
+    if (p <= start) offset = centerToTargetX;
+    else if (p >= riseEnd) offset = 0;
+    else {
+      const t = (p - start) / (riseEnd - start);
+      offset = centerToTargetX * (1 - t);
+    }
+    const driftT = Math.min(Math.max((p - start) / (end - start), 0), 1);
+    const drift = config.drift.x * driftT;
+    return `calc(-50% + ${(offset + drift).toFixed(2)}vw)`;
+  });
+
+  const translateY = useTransform(progress, (p) => {
+    let offset: number;
+    if (p <= start) offset = centerToTargetY;
+    else if (p >= riseEnd) offset = 0;
+    else {
+      const t = (p - start) / (riseEnd - start);
+      offset = centerToTargetY * (1 - t);
+    }
+    const driftT = Math.min(Math.max((p - start) / (end - start), 0), 1);
+    const drift = config.drift.y * driftT;
+    return `calc(-50% + ${(offset + drift).toFixed(2)}vh)`;
+  });
+
+  // Trimmed floor + vw basis so bubbles stay comfortably sized on mobile
+  // without ballooning large enough to clip under the navbar.
+  const floor = config.size * 0.5;
+  const sizeStyle = `clamp(${floor}px, 50vw, ${config.size}px)`;
 
   return (
     <div
       className={config.priority ? undefined : "hidden xs:block"}
       style={{
         position: "absolute",
-        left: `clamp(12%, ${config.x}, 88%)`,
-        top: `clamp(20%, ${config.y}, 82%)`,
+        // clamped, static target position — computed once, never animated,
+        // so it costs nothing on scroll. Top clamp raised to 26% (from 20%)
+        // to keep bubbles clear of the navbar/header area.
+        left: `clamp(12%, ${config.x}%, 88%)`,
+        top: `clamp(26%, ${config.y}%, 82%)`,
         width: sizeStyle,
         height: sizeStyle,
-        transform: "translate(-50%, -50%)",
         zIndex: 10 + index,
       }}
     >
@@ -71,8 +106,9 @@ const Bubble: React.FC<{
           height: "100%",
           opacity,
           scale,
-          x: driftX,
-          y: driftY,
+          rotate,
+          x: translateX,
+          y: translateY,
           willChange: "transform, opacity",
         }}
         className="rounded-full overflow-hidden border border-white/10 shadow-[0_0_36px_rgba(0,0,0,0.45)] pointer-events-none"
@@ -159,36 +195,38 @@ export const BubbleScroll: React.FC = () => {
     offset: ["start start", "end end"],
   });
 
-  // ONE spring smooths the whole sequence instead of 24 separate ones —
-  // this is the main fix. Every bubble reads off this single value.
+  // Slightly stiffer / more damped spring than before to reduce overshoot
+  // ringing, now that it's the only thing driving cheap transform updates.
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    mass: 0.5,
+    stiffness: 120,
+    damping: 34,
+    mass: 0.4,
   });
 
   const progress = prefersReducedMotion ? scrollYProgress : smoothProgress;
 
+  // Targets kept in the safe visible band. Top values raised slightly
+  // (min ~26% after clamping) so nothing sits under the navbar.
   const bubbles: BubbleConfig[] = useMemo(() => {
     if (randomImages.length < 8) return [];
     return [
-      { url: randomImages[0], size: 360, x: "15%", y: "32%", range: [0, 0.4], drift: { x: 50, y: -80 }, priority: true },
-      { url: randomImages[1], size: 260, x: "72%", y: "28%", range: [0.1, 0.5], drift: { x: -40, y: -60 }, priority: true },
-      { url: randomImages[2], size: 310, x: "28%", y: "60%", range: [0.25, 0.65], drift: { x: 60, y: -100 }, priority: true },
-      { url: randomImages[3], size: 220, x: "82%", y: "45%", range: [0.35, 0.75], drift: { x: -80, y: -70 } },
-      { url: randomImages[4], size: 340, x: "10%", y: "50%", range: [0.5, 0.85], drift: { x: 100, y: -90 }, priority: true },
-      { url: randomImages[5], size: 280, x: "68%", y: "70%", range: [0.6, 0.95], drift: { x: -30, y: -120 } },
-      { url: randomImages[6], size: 300, x: "25%", y: "75%", range: [0.75, 1.0], drift: { x: 40, y: -90 }, priority: true },
-      { url: randomImages[7], size: 380, x: "60%", y: "25%", range: [0.8, 1.0], drift: { x: -60, y: -150 } },
+      { url: randomImages[0], size: 380, x: 18, y: 36, range: [0, 0.4], drift: { x: 8, y: -14 }, priority: true },
+      { url: randomImages[1], size: 280, x: 74, y: 32, range: [0.1, 0.5], drift: { x: -6, y: -10 }, priority: true },
+      { url: randomImages[2], size: 330, x: 30, y: 62, range: [0.25, 0.65], drift: { x: 9, y: -16 }, priority: true },
+      { url: randomImages[3], size: 240, x: 80, y: 46, range: [0.35, 0.75], drift: { x: -11, y: -12 } },
+      { url: randomImages[4], size: 360, x: 14, y: 54, range: [0.5, 0.85], drift: { x: 14, y: -14 }, priority: true },
+      { url: randomImages[5], size: 300, x: 66, y: 70, range: [0.6, 0.95], drift: { x: -5, y: -18 } },
+      { url: randomImages[6], size: 320, x: 28, y: 76, range: [0.75, 1.0], drift: { x: 7, y: -14 }, priority: true },
+      { url: randomImages[7], size: 400, x: 60, y: 32, range: [0.8, 1.0], drift: { x: -9, y: -20 } },
     ];
   }, [randomImages]);
 
   if (!mounted || bubbles.length < 8) {
     if (prefersReducedMotion) {
-      return <section ref={containerRef} className="relative py-24 bg-transparent min-h-[400px]" />;
+      return <section ref={containerRef} style={{ position: "relative" }} className="relative py-24 bg-transparent min-h-[400px]" />;
     }
     return (
-      <section ref={containerRef} className="relative h-[800vh] bg-transparent">
+      <section ref={containerRef} style={{ position: "relative" }} className="relative h-[800vh] bg-transparent">
         <div className="sticky top-0 h-screen w-full overflow-hidden pointer-events-none">
           <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none">
             <h2 className="text-[20vw] font-serif uppercase tracking-tighter leading-none dark:text-white text-black text-center select-none italic">
@@ -203,7 +241,7 @@ export const BubbleScroll: React.FC = () => {
   // Respect reduced-motion users entirely — no parallax, just a static collage.
   if (prefersReducedMotion) {
     return (
-      <section ref={containerRef} className="relative py-24 bg-transparent">
+      <section ref={containerRef} style={{ position: "relative" }} className="relative py-24 bg-transparent">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 px-6">
           {bubbles.map((b, i) => (
             <div key={i} className="aspect-square rounded-full overflow-hidden border border-white/10">
@@ -216,7 +254,7 @@ export const BubbleScroll: React.FC = () => {
   }
 
   return (
-    <section ref={containerRef} className="relative h-[800vh] bg-transparent">
+    <section ref={containerRef} style={{ position: "relative" }} className="relative h-[800vh] bg-transparent">
       <div className="sticky top-0 h-screen w-full overflow-hidden pointer-events-none">
         <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none">
           <h2 className="text-[20vw] font-serif uppercase tracking-tighter leading-none dark:text-white text-black text-center select-none italic">

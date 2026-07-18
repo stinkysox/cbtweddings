@@ -38,7 +38,7 @@ const REVIEWS: Testimonial[] = [
     name: "Sara & Ishaan",
     event: "The Estate Celebration",
     quote:
-      "Seamless, professional, and artistically superior. Weddingwit has a way of seeing light that feels almost supernatural. Our legacy is in safe hands.",
+      "Seamless, professional, and artistically superior. CBT Weddings has a way of seeing light that feels almost supernatural. Our legacy is in safe hands.",
   },
 ];
 

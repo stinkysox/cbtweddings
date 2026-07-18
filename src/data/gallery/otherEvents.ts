@@ -1,3 +1,88 @@
 import { GalleryItem } from "@/types";
 
-export const OTHER_EVENTS_GALLERY: GalleryItem[] = [];
+export const OTHER_EVENTS_GALLERY: GalleryItem[] = [
+  {
+    id: "o1",
+    category: "Other Events",
+    imageUrl: "https://i.postimg.cc/Cxc47wKz/MAN00827.jpg",
+    title: "A Grand Celebration",
+    description: "Elegant moments captured with timeless sophistication.",
+  },
+  {
+    id: "o2",
+    category: "Other Events",
+    imageUrl: "https://i.postimg.cc/Z5wLHJq6/MAN09822.jpg",
+    title: "Moments of Togetherness",
+    description: "Where every celebration becomes an unforgettable memory.",
+  },
+  {
+    id: "o3",
+    category: "Other Events",
+    imageUrl: "https://i.postimg.cc/x1fRLX9Y/MAV01317.jpg",
+    title: "Joy in Every Frame",
+    description: "Candid emotions preserved with cinematic elegance.",
+  },
+  {
+    id: "o4",
+    category: "Other Events",
+    imageUrl: "https://i.postimg.cc/4xf5pYXR/MAV01405.jpg",
+    title: "Celebrating Life",
+    description: "Beautiful gatherings filled with warmth and happiness.",
+  },
+  {
+    id: "o5",
+    category: "Other Events",
+    imageUrl: "https://i.postimg.cc/XvDy91xL/CBT06987.jpg",
+    title: "The Perfect Occasion",
+    description: "Thoughtfully documenting every meaningful detail.",
+  },
+  {
+    id: "o6",
+    category: "Other Events",
+    imageUrl: "https://i.postimg.cc/1tnVB0YK/CBT07411.jpg",
+    title: "Shared Smiles",
+    description: "A celebration of love, family, and lasting memories.",
+  },
+  {
+    id: "o7",
+    category: "Other Events",
+    imageUrl: "https://i.postimg.cc/JnDHx32r/DSC00098.jpg",
+    title: "Timeless Gatherings",
+    description: "Every frame reflects the beauty of the occasion.",
+  },
+  {
+    id: "o8",
+    category: "Other Events",
+    imageUrl: "https://i.postimg.cc/C1Bn7C66/MAN00701.jpg",
+    title: "Elegant Stories",
+    description: "Crafted with an editorial eye and cinematic emotion.",
+  },
+  {
+    id: "o9",
+    category: "Other Events",
+    imageUrl: "https://i.postimg.cc/j5wnc6k8/MAN00764.jpg",
+    title: "An Evening to Remember",
+    description: "Capturing celebrations with authenticity and grace.",
+  },
+  {
+    id: "o10",
+    category: "Other Events",
+    imageUrl: "https://i.postimg.cc/W3BFHDBv/MAN02436.jpg",
+    title: "Luxury in Every Detail",
+    description: "Refined imagery inspired by the finest celebrations.",
+  },
+  {
+    id: "o11",
+    category: "Other Events",
+    imageUrl: "https://i.postimg.cc/mDz1j352/MAN08108.jpg",
+    title: "Moments That Last",
+    description: "Beautifully preserving every meaningful connection.",
+  },
+  {
+    id: "o12",
+    category: "Other Events",
+    imageUrl: "https://i.postimg.cc/G2W85BWb/MAN09800.jpg",
+    title: "Celebrations Beyond Weddings",
+    description: "Because every milestone deserves to be remembered beautifully.",
+  },
+];

@@ -3,13 +3,35 @@
 import { useEffect, useRef, useState } from "react";
 
 export interface AuroraProps {
-  colorA?: [number, number, number];
-  colorB?: [number, number, number];
+  colorA?: [number, number, number] | string;
+  colorB?: [number, number, number] | string;
   speed?: number;
   intensity?: number;
   blur?: number;
   renderScale?: number;
   className?: string;
+}
+
+function parseColor(color: [number, number, number] | string): [number, number, number] {
+  if (typeof color === 'string') {
+    const hex = color.replace(/^#/, '');
+    if (hex.length === 3) {
+      return [
+        parseInt(hex[0] + hex[0], 16) / 255,
+        parseInt(hex[1] + hex[1], 16) / 255,
+        parseInt(hex[2] + hex[2], 16) / 255,
+      ];
+    }
+    if (hex.length === 6) {
+      return [
+        parseInt(hex.slice(0, 2), 16) / 255,
+        parseInt(hex.slice(2, 4), 16) / 255,
+        parseInt(hex.slice(4, 6), 16) / 255,
+      ];
+    }
+    return [0, 0, 0];
+  }
+  return color;
 }
 
 const VERTEX_SRC = `
@@ -108,20 +130,6 @@ export default function Aurora({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [webGLActive, setWebGLActive] = useState(false);
 
-  // FIX (hydration mismatch): iOS detection used to run inline during
-  // render via `typeof window !== "undefined" && isIOSSafari()`. That's a
-  // server/client render branch — on the server `window` is undefined so
-  // it evaluates to false, but on the client the *very first* render pass
-  // (the one React reconciles against the server HTML) already has
-  // `window`, so it can evaluate to true before hydration completes. That
-  // mismatch is exactly what produced the "tree hydrated but attributes
-  // didn't match" error on the canvas's inline style (blur, transform,
-  // opacity, transition all diffed as a result).
-  //
-  // Fix: never let iOS detection affect the first render's output. Detect
-  // it only inside an effect (client-only, runs after hydration), and
-  // store it in state so the first render — server and client alike —
-  // always uses the same non-iOS defaults.
   const [isIOS, setIsIOS] = useState(false);
   useEffect(() => {
     setIsIOS(isIOSSafari());
@@ -130,20 +138,18 @@ export default function Aurora({
   const effectiveBlur = isIOS ? Math.min(blur, 18) : blur;
   const softness = isIOS ? 0.22 : 0.12;
 
-  const colorARef = useRef(colorA);
-  const colorBRef = useRef(colorB);
+  const parsedColorA = parseColor(colorA);
+  const parsedColorB = parseColor(colorB);
+
+  const colorARef = useRef(parsedColorA);
+  const colorBRef = useRef(parsedColorB);
   const speedRef = useRef(speed);
   const intensityRef = useRef(intensity);
   const renderScaleRef = useRef(renderScale);
-  // softness now lives in a ref too, read fresh each frame in drawFrame.
-  // This means the WebGL setup effect below no longer needs `softness` in
-  // its dependency array, so detecting iOS a beat after mount doesn't
-  // tear down and rebuild the GL context — it just changes what value
-  // gets uploaded to the shader on the next frame.
   const softnessRef = useRef(softness);
 
-  colorARef.current = colorA;
-  colorBRef.current = colorB;
+  colorARef.current = parsedColorA;
+  colorBRef.current = parsedColorB;
   speedRef.current = speed;
   intensityRef.current = intensity;
   renderScaleRef.current = renderScale;
@@ -326,9 +332,10 @@ export default function Aurora({
       gl.deleteShader(fragmentShader);
       gl.deleteBuffer(positionBuffer);
     };
-    // Runs once on mount. softness is read from softnessRef inside the
-    // loop, so it no longer needs to be a dependency here.
   }, []);
+
+  const fallbackColorAStr = `rgba(${Math.round(parsedColorA[0] * 255)},${Math.round(parsedColorA[1] * 255)},${Math.round(parsedColorA[2] * 255)},0.4)`;
+  const fallbackColorBStr = `rgba(${Math.round(parsedColorB[0] * 255)},${Math.round(parsedColorB[1] * 255)},${Math.round(parsedColorB[2] * 255)},0.4)`;
 
   return (
     <div
@@ -355,7 +362,7 @@ export default function Aurora({
             className="aurora-fallback absolute inset-0 -z-10 opacity-90"
             style={{
               background:
-                "radial-gradient(45% 55% at 16% -5%, rgba(166,200,255,0.4), rgba(0,0,0,0) 70%), radial-gradient(45% 55% at 84% -5%, rgba(224,187,228,0.4), rgba(0,0,0,0) 70%)",
+                `radial-gradient(45% 55% at 16% -5%, ${fallbackColorAStr}, rgba(0,0,0,0) 70%), radial-gradient(45% 55% at 84% -5%, ${fallbackColorBStr}, rgba(0,0,0,0) 70%)`,
               filter: "blur(50px)",
             }}
           />

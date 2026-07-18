@@ -134,7 +134,7 @@ export default function Gallery() {
       </div>
 
       {/* Optimized Floating Filter Dock with Hidden Scrollbar */}
-      <div className="fixed bottom-8 inset-x-0 z-40 flex justify-center px-4 pointer-events-none">
+      <div className="fixed bottom-8 inset-x-0 z-60 flex justify-center px-4 pointer-events-none">
         <div className="pointer-events-auto flex items-center gap-1 p-1.5 rounded-full bg-black/60 backdrop-blur-2xl border border-white/10 shadow-2xl max-w-full overflow-x-auto hide-scrollbar select-none">
           {CATEGORIES.map((cat) => {
             const isActive = filter === cat;

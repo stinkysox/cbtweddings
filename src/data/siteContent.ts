@@ -10,7 +10,6 @@ export const siteContent = {
       { name: "Gallery", path: "/gallery" },
       { name: "Testimonials", path: "/testimonials" },
       { name: "Contact", path: "/contact" },
-      { name: "Wedding", path: "/wedding" },
     ],
     cta: {
       text: "Book Now",
@@ -32,7 +31,7 @@ export const siteContent = {
       description: "We don't chase trends; we capture essence. To us, creativity is the art of subtraction stripping away the performative to reveal the profound. By blending a high-fashion editorial eye with cinematic patience, we weave visual narratives that stand the test of time. We treat every frame not as a checklist, but as a living canvas where raw human emotion writes its own script.",
       linkText: "Our Philosophy",
       linkUrl: "/about",
-      image: "https://i.postimg.cc/DZZdHH81/behance-img-13.jpg",
+      image: "https://i.postimg.cc/rmPCkj4F/behance-img-9.jpg",
     },
     services: [
       {
@@ -181,19 +180,18 @@ export const siteContent = {
     info: {
       studio: {
         title: "The Studio",
-        details: ["Block 42, The Deccan Quarter", "Jubilee Hills, Hyderabad", "Telangana, 500033"],
+        details: ["B-66, First Floor", "New Rajinder Nagar", "New Delhi, 110060"],
       },
       communication: {
         title: "Communication",
         email: "archives@cbtweddings.com",
-        phone: "+91 (0) 40 4567 8910",
+        phone: "+91 8800180670",
       },
       social: {
         title: "Social Narrative",
         links: [
-          { name: "Instagram", url: "https://instagram.com" },
-          { name: "Vimeo", url: "https://vimeo.com" },
-          { name: "WhatsApp", url: "https://wa.me/914045678910" },
+          { name: "Instagram", url: "https://www.instagram.com/creativitybeyondthoughts/" },
+          { name: "WhatsApp", url: "https://wa.me/918800180670" },
         ],
       },
     },
@@ -232,9 +230,9 @@ export const siteContent = {
   footer: {
     description: "An intentional visual house weaving editorial art and raw human emotion. Preserving the permanent texture of your history, wherever it unfolds.",
     socials: [
-      { name: "Instagram", url: "https://instagram.com", icon: "instagram" },
+      { name: "Instagram", url: "https://www.instagram.com/creativitybeyondthoughts/", icon: "instagram" },
       { name: "YouTube", url: "https://youtube.com", icon: "youtube" },
-      { name: "WhatsApp", url: "https://wa.me/914045678910", icon: "whatsapp" },
+      { name: "WhatsApp", url: "https://wa.me/918800180670", icon: "whatsapp" },
       { name: "Pinterest", url: "https://pinterest.com", icon: "pinterest" },
     ],
     directory: [
@@ -245,15 +243,15 @@ export const siteContent = {
     ],
     contact: {
       email: "archives@cbtweddings.com",
-      phone: "+91 (0) 40 4567 8910",
-      address: "Jubilee Hills, Hyderabad",
-      phoneRaw: "+914045678910", 
+      phone: "+91 8800180670",
+      address: "New Rajinder Nagar, New Delhi",
+      phoneRaw: "+918800180670", 
     },
     availability: {
       text: "Accepting a select number of commissions worldwide for the 2026 & 2027 seasons.",
       status: "Available Globally",
     },
     copyright: "CBT Weddings Artistry Archive. All Visual Content Protected.",
-    legacies: "Legacies Crafted Globally. Headquartered in Hyderabad, India.",
+    legacies: "Legacies Crafted Globally. Headquartered in New Delhi, India.",
   }, 
 };
