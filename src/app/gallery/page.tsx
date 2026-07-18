@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import Image from "next/image";
 import { GALLERY_DATA } from "@/data/gallery";
@@ -19,6 +19,11 @@ export default function Gallery() {
   const [filter, setFilter] = useState("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [direction, setDirection] = useState(0);
+
+  // Refs for the filter dock: the scrollable container + one button per
+  // category, so we can scroll whichever pill is active into full view.
+  const dockScrollRef = useRef<HTMLDivElement>(null);
+  const pillRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const filteredItems = GALLERY_DATA.filter((item) =>
     filter === "All" ? true : item.category === filter
@@ -52,6 +57,30 @@ export default function Gallery() {
   useEffect(() => {
     document.body.style.overflow = lightboxIndex !== null ? "hidden" : "";
   }, [lightboxIndex]);
+
+  // AUTO-SCROLL FIX: whenever the active filter changes, scroll the dock so
+  // the selected pill is fully visible (centered horizontally within the
+  // dock), instead of leaving it clipped at the edge when it happens to be
+  // one of the last items and the user tapped it via keyboard/programmatically
+  // or it was partially visible already.
+  useEffect(() => {
+    const container = dockScrollRef.current;
+    const activePill = pillRefs.current[filter];
+    if (!container || !activePill) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const pillRect = activePill.getBoundingClientRect();
+
+    // Current scroll offset of the pill relative to the container's content
+    const pillOffsetLeft = activePill.offsetLeft;
+    const pillCenter = pillOffsetLeft + pillRect.width / 2;
+    const containerCenter = container.clientWidth / 2;
+
+    container.scrollTo({
+      left: pillCenter - containerCenter,
+      behavior: "smooth",
+    });
+  }, [filter]);
 
   const handleSwipe = (e: any, { offset, velocity }: PanInfo) => {
     const swipePower = Math.abs(offset.x) * velocity.x;
@@ -135,12 +164,18 @@ export default function Gallery() {
 
       {/* Optimized Floating Filter Dock with Hidden Scrollbar */}
       <div className="fixed bottom-8 inset-x-0 z-60 flex justify-center px-4 pointer-events-none">
-        <div className="pointer-events-auto flex items-center gap-1 p-1.5 rounded-full bg-black/60 backdrop-blur-2xl border border-white/10 shadow-2xl max-w-full overflow-x-auto hide-scrollbar select-none">
+        <div
+          ref={dockScrollRef}
+          className="pointer-events-auto flex items-center gap-1 p-1.5 rounded-full bg-black/60 backdrop-blur-2xl border border-white/10 shadow-2xl max-w-full overflow-x-auto hide-scrollbar select-none"
+        >
           {CATEGORIES.map((cat) => {
             const isActive = filter === cat;
             return (
               <button
                 key={cat}
+                ref={(el) => {
+                  pillRefs.current[cat] = el;
+                }}
                 onClick={() => {
                   setFilter(cat);
                   setLightboxIndex(null); 

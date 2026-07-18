@@ -15,10 +15,10 @@ import { GALLERY_DATA } from "@/data/gallery";
 interface BubbleConfig {
   url: string;
   size: number; // desktop max size in px
-  x: number; // target x position in % (viewport width)
-  y: number; // target y position in % (viewport height)
-  range: [number, number];
-  drift: { x: number; y: number }; // in vw/vh units, applied as a transform
+  x: number; // position in % (viewport width)
+  y: number; // position in % (viewport height)
+  range: [number, number]; // scroll progress window this bubble is visible in
+  drift: number; // upward drift distance in px over the bubble's whole range
   priority?: boolean; // hide on very small screens to cut load
 }
 
@@ -27,62 +27,32 @@ const Bubble: React.FC<{
   progress: MotionValue<number>;
   index: number;
 }> = React.memo(({ config, progress, index }) => {
-  const start = config.range[0];
-  const end = config.range[1];
-  const mid = (start + end) / 2;
-  const riseEnd = Math.min(start + 0.2, end);
+  const [start, end] = config.range;
+  const span = end - start;
+  const fadeInEnd = start + span * 0.25;
+  const fadeOutStart = end - span * 0.25;
 
-  const opacity = useTransform(progress, [start, riseEnd, end - 0.15, end], [0, 1, 1, 0]);
-  const scale = useTransform(progress, [start, riseEnd, mid, end], [0.55, 1.05, 1.2, 0.8]);
-  const rotate = useTransform(progress, [start, mid, end], [config.drift.x > 0 ? -5 : 5, 0, config.drift.x > 0 ? 5 : -5]);
+  const opacity = useTransform(
+    progress,
+    [start, fadeInEnd, fadeOutStart, end],
+    [0, 1, 1, 0],
+    { clamp: true }
+  );
+  const scale = useTransform(
+    progress,
+    [start, fadeInEnd, fadeOutStart, end],
+    [0.85, 1, 1, 0.9],
+    { clamp: true }
+  );
+  // DRIFT: plain numeric array -> numeric array, same shape as opacity/scale
+  // above. This is the cheap kind of useTransform (a lookup + interpolation),
+  // not the callback kind that builds a new string every frame — that
+  // callback pattern was the actual source of the earlier jerk. Drifts
+  // upward (negative y) by `config.drift` px across the bubble's own range,
+  // so it's a slow continuous rise the whole time the bubble is visible.
+  const y = useTransform(progress, [start, end], [0, -config.drift], { clamp: true });
 
-  // PERFORMANCE FIX: everything below is a single derived MotionValue per axis,
-  // computed with a plain function instead of chaining useTransform -> useTransform
-  // -> template string. It outputs ONE "transform: translate()" value, so the
-  // browser only ever composites — it never has to re-run layout. This is what
-  // kills the scroll jitter: the previous version animated `left`/`top` (layout
-  // properties) every frame, which is expensive and was the actual cause of the
-  // stutter, not the spring config.
-  //
-  // The bubble's outer wrapper is placed at its final target position (x%, y%)
-  // statically (see JSX below) — never animated. To get the "bursts out from
-  // center" effect without moving that layout position, we instead translate
-  // the element by "distance from center to target" (in vw/vh, so it scales
-  // with the viewport) at start, animating that distance down to 0 by riseEnd.
-  // A bit of continuous drift (also in vw/vh) is layered on top of the same
-  // value so it keeps drifting after it arrives.
-  const centerToTargetX = 50 - config.x; // vw units needed to reach center from target
-  const centerToTargetY = 50 - config.y; // vh units
-
-  const translateX = useTransform(progress, (p) => {
-    let offset: number;
-    if (p <= start) offset = centerToTargetX;
-    else if (p >= riseEnd) offset = 0;
-    else {
-      const t = (p - start) / (riseEnd - start);
-      offset = centerToTargetX * (1 - t);
-    }
-    const driftT = Math.min(Math.max((p - start) / (end - start), 0), 1);
-    const drift = config.drift.x * driftT;
-    return `calc(-50% + ${(offset + drift).toFixed(2)}vw)`;
-  });
-
-  const translateY = useTransform(progress, (p) => {
-    let offset: number;
-    if (p <= start) offset = centerToTargetY;
-    else if (p >= riseEnd) offset = 0;
-    else {
-      const t = (p - start) / (riseEnd - start);
-      offset = centerToTargetY * (1 - t);
-    }
-    const driftT = Math.min(Math.max((p - start) / (end - start), 0), 1);
-    const drift = config.drift.y * driftT;
-    return `calc(-50% + ${(offset + drift).toFixed(2)}vh)`;
-  });
-
-  // Trimmed floor + vw basis so bubbles stay comfortably sized on mobile
-  // without ballooning large enough to clip under the navbar.
-  const floor = config.size * 0.5;
+  const floor = config.size * 0.55;
   const sizeStyle = `clamp(${floor}px, 50vw, ${config.size}px)`;
 
   return (
@@ -90,13 +60,11 @@ const Bubble: React.FC<{
       className={config.priority ? undefined : "hidden xs:block"}
       style={{
         position: "absolute",
-        // clamped, static target position — computed once, never animated,
-        // so it costs nothing on scroll. Top clamp raised to 26% (from 20%)
-        // to keep bubbles clear of the navbar/header area.
         left: `clamp(12%, ${config.x}%, 88%)`,
         top: `clamp(26%, ${config.y}%, 82%)`,
         width: sizeStyle,
         height: sizeStyle,
+        transform: "translate(-50%, -50%)",
         zIndex: 10 + index,
       }}
     >
@@ -106,9 +74,7 @@ const Bubble: React.FC<{
           height: "100%",
           opacity,
           scale,
-          rotate,
-          x: translateX,
-          y: translateY,
+          y,
           willChange: "transform, opacity",
         }}
         className="rounded-full overflow-hidden border border-white/10 shadow-[0_0_36px_rgba(0,0,0,0.45)] pointer-events-none"
@@ -195,29 +161,30 @@ export const BubbleScroll: React.FC = () => {
     offset: ["start start", "end end"],
   });
 
-  // Slightly stiffer / more damped spring than before to reduce overshoot
-  // ringing, now that it's the only thing driving cheap transform updates.
+  // Overdamped spring — settles smoothly with no overshoot/oscillation,
+  // which is what avoids any jerk/snap at the edges of the scroll range.
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 34,
-    mass: 0.4,
+    stiffness: 300,
+    damping: 40,
+    mass: 1,
   });
 
   const progress = prefersReducedMotion ? scrollYProgress : smoothProgress;
 
-  // Targets kept in the safe visible band. Top values raised slightly
-  // (min ~26% after clamping) so nothing sits under the navbar.
+  // Each bubble gets a modest upward drift (in px) across its own range.
+  // Bigger bubbles drift a bit more so the motion reads as natural, not
+  // uniform/mechanical.
   const bubbles: BubbleConfig[] = useMemo(() => {
     if (randomImages.length < 8) return [];
     return [
-      { url: randomImages[0], size: 380, x: 18, y: 36, range: [0, 0.4], drift: { x: 8, y: -14 }, priority: true },
-      { url: randomImages[1], size: 280, x: 74, y: 32, range: [0.1, 0.5], drift: { x: -6, y: -10 }, priority: true },
-      { url: randomImages[2], size: 330, x: 30, y: 62, range: [0.25, 0.65], drift: { x: 9, y: -16 }, priority: true },
-      { url: randomImages[3], size: 240, x: 80, y: 46, range: [0.35, 0.75], drift: { x: -11, y: -12 } },
-      { url: randomImages[4], size: 360, x: 14, y: 54, range: [0.5, 0.85], drift: { x: 14, y: -14 }, priority: true },
-      { url: randomImages[5], size: 300, x: 66, y: 70, range: [0.6, 0.95], drift: { x: -5, y: -18 } },
-      { url: randomImages[6], size: 320, x: 28, y: 76, range: [0.75, 1.0], drift: { x: 7, y: -14 }, priority: true },
-      { url: randomImages[7], size: 400, x: 60, y: 32, range: [0.8, 1.0], drift: { x: -9, y: -20 } },
+      { url: randomImages[0], size: 380, x: 18, y: 36, range: [0, 0.4], drift: 70, priority: true },
+      { url: randomImages[1], size: 280, x: 74, y: 32, range: [0.1, 0.5], drift: 55, priority: true },
+      { url: randomImages[2], size: 330, x: 30, y: 62, range: [0.25, 0.65], drift: 65, priority: true },
+      { url: randomImages[3], size: 240, x: 80, y: 46, range: [0.35, 0.75], drift: 50 },
+      { url: randomImages[4], size: 360, x: 14, y: 54, range: [0.5, 0.85], drift: 68, priority: true },
+      { url: randomImages[5], size: 300, x: 66, y: 70, range: [0.6, 0.95], drift: 58 },
+      { url: randomImages[6], size: 320, x: 28, y: 76, range: [0.75, 1.0], drift: 62, priority: true },
+      { url: randomImages[7], size: 400, x: 60, y: 32, range: [0.8, 1.0], drift: 72 },
     ];
   }, [randomImages]);
 
