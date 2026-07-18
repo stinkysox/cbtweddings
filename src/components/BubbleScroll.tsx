@@ -19,8 +19,7 @@ interface BubbleConfig {
   x: number;
   y: number;
   range: [number, number];
-  drift: number; 
-  priority?: boolean;
+  drift: number;
 }
 
 const Bubble: React.FC<{
@@ -31,7 +30,7 @@ const Bubble: React.FC<{
   const [start, end] = config.range;
   const span = end - start;
   
-  // Adjusted timing for a slightly faster fade in, letting the drift take focus
+  // Timing for a slightly faster fade in, letting the drift take focus
   const fadeInEnd = start + span * 0.3;
   const fadeOutStart = end - span * 0.3;
 
@@ -66,12 +65,12 @@ const Bubble: React.FC<{
   );
   const filter = useMotionTemplate`blur(${blurValue}px)`;
 
+  // Adjusted scale floor + higher vw ceiling so bubbles read as large, premium circles on mobile
   const floor = config.size * 0.55;
-  const sizeStyle = `clamp(${floor}px, 50vw, ${config.size}px)`;
+  const sizeStyle = `clamp(${floor}px, 62vw, ${config.size}px)`;
 
   return (
     <div
-      className={config.priority ? undefined : "hidden xs:block"}
       style={{
         position: "absolute",
         left: `clamp(12%, ${config.x}%, 88%)`,
@@ -109,7 +108,7 @@ const Bubble: React.FC<{
 Bubble.displayName = "Bubble";
 
 /**
- * Updated to a sleek, ivory/frosted aesthetic for a luxury feel.
+ * Sleek, ivory/frosted progress bar matching an ultra-premium aesthetic.
  */
 const ScrollProgressBar: React.FC<{ progress: MotionValue<number> }> = ({ progress }) => {
   const opacity = useTransform(progress, [0, 0.05, 0.95, 1], [0, 1, 1, 0]);
@@ -161,7 +160,7 @@ export const BubbleScroll: React.FC = () => {
     offset: ["start start", "end end"],
   });
 
-  // Softened the spring for a more fluid, organic connection to the scroll wheel
+  // Softened the spring for a fluid, organic connection to the scroll wheel
   const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 80,
     damping: 30,
@@ -174,22 +173,22 @@ export const BubbleScroll: React.FC = () => {
   // Parallax the background text slightly opposite to the scroll
   const bgTextY = useTransform(progress, [0, 1], ["0%", "15%"]);
 
-  // Increased drift values for a more pronounced floating effect
+  // Drift values set for a pronounced floating effect; priority flags removed so all show
+  // Base sizes bumped up so bubbles feel large and premium at the new clamp ceiling
   const bubbles: BubbleConfig[] = useMemo(() => {
     if (randomImages.length < 8) return [];
     return [
-      { url: randomImages[0], size: 380, x: 18, y: 36, range: [0, 0.45], drift: 180, priority: true },
-      { url: randomImages[1], size: 280, x: 74, y: 32, range: [0.1, 0.55], drift: 150, priority: true },
-      { url: randomImages[2], size: 330, x: 30, y: 62, range: [0.25, 0.7], drift: 170, priority: true },
-      { url: randomImages[3], size: 240, x: 80, y: 46, range: [0.35, 0.75], drift: 130 },
-      { url: randomImages[4], size: 360, x: 14, y: 54, range: [0.5, 0.85], drift: 190, priority: true },
-      { url: randomImages[5], size: 300, x: 66, y: 70, range: [0.6, 0.95], drift: 160 },
-      { url: randomImages[6], size: 320, x: 28, y: 76, range: [0.75, 1.0], drift: 175, priority: true },
-      { url: randomImages[7], size: 400, x: 60, y: 32, range: [0.8, 1.0], drift: 210 },
+      { url: randomImages[0], size: 440, x: 18, y: 36, range: [0, 0.45], drift: 180 },
+      { url: randomImages[1], size: 340, x: 74, y: 32, range: [0.1, 0.55], drift: 150 },
+      { url: randomImages[2], size: 390, x: 30, y: 62, range: [0.25, 0.7], drift: 170 },
+      { url: randomImages[3], size: 300, x: 80, y: 46, range: [0.35, 0.75], drift: 130 },
+      { url: randomImages[4], size: 420, x: 14, y: 54, range: [0.5, 0.85], drift: 190 },
+      { url: randomImages[5], size: 360, x: 66, y: 70, range: [0.6, 0.95], drift: 160 },
+      { url: randomImages[6], size: 380, x: 28, y: 76, range: [0.75, 1.0], drift: 175 },
+      { url: randomImages[7], size: 460, x: 60, y: 32, range: [0.8, 1.0], drift: 210 },
     ];
   }, [randomImages]);
 
-  // Changed placeholder height to match the new 350vh
   if (!mounted || bubbles.length < 8) {
     if (prefersReducedMotion) {
       return <section ref={containerRef} className="relative py-24 bg-transparent min-h-[400px]" />;
@@ -222,11 +221,9 @@ export const BubbleScroll: React.FC = () => {
   }
 
   return (
-    // Reduced container height from 800vh to 350vh for faster, more engaging scroll pacing
     <section ref={containerRef} className="relative h-[350vh] bg-transparent">
       <div className="sticky top-0 h-screen w-full overflow-hidden pointer-events-none">
         
-        {/* Added subtle parallax to the background text */}
         <motion.div 
           style={{ y: bgTextY }}
           className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none"
