@@ -60,7 +60,18 @@ export default function Gallery() {
   };
 
   return (
-    <div className="relative min-h-screen pt-32 pb-40 px-4 md:px-8">
+    <div className="relative min-h-screen pt-32 pb-40 px-4 md:px-8 bg-black">
+      {/* Dynamic Style Tag to completely kill horizontal scrollbars safely */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none !important;
+        }
+        .hide-scrollbar {
+          -ms-overflow-style: none !important;
+          scrollbar-width: none !important;
+        }
+      `}} />
+
       {/* Title Area */}
       <div className="max-w-7xl mx-auto mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
@@ -122,9 +133,9 @@ export default function Gallery() {
         </motion.div>
       </div>
 
-      {/* Floating Filter Dock */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 max-w-[90vw] overflow-x-auto no-scrollbar">
-        <div className="flex items-center gap-1 p-1.5 rounded-full bg-black/40 backdrop-blur-2xl border border-white/10 shadow-2xl">
+      {/* Optimized Floating Filter Dock with Hidden Scrollbar */}
+      <div className="fixed bottom-8 inset-x-0 z-40 flex justify-center px-4 pointer-events-none">
+        <div className="pointer-events-auto flex items-center gap-1 p-1.5 rounded-full bg-black/60 backdrop-blur-2xl border border-white/10 shadow-2xl max-w-full overflow-x-auto hide-scrollbar select-none">
           {CATEGORIES.map((cat) => {
             const isActive = filter === cat;
             return (
@@ -134,19 +145,18 @@ export default function Gallery() {
                   setFilter(cat);
                   setLightboxIndex(null); 
                 }}
-                className="relative px-5 py-2.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-semibold whitespace-nowrap transition-colors"
-                style={{ color: isActive ? "#000" : "rgba(255,255,255,0.6)" }}
+                className={`relative px-5 py-2.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-semibold whitespace-nowrap flex-shrink-0 transition-colors duration-300 ease-out outline-none focus:outline-none select-none [webkit-tap-highlight-color:transparent] ${
+                  isActive ? "text-black font-bold" : "text-white/60 hover:text-white"
+                }`}
               >
                 {isActive && (
                   <motion.div
                     layoutId="filter-pill"
-                    className="absolute inset-0 bg-white rounded-full z-0"
-                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                    className="absolute inset-0 bg-white rounded-full z-0 shadow-md"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
-                <span className="relative z-10 hover:text-white transition-colors">
-                  {cat}
-                </span>
+                <span className="relative z-10">{cat}</span>
               </button>
             );
           })}
@@ -186,10 +196,9 @@ export default function Gallery() {
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.7}
                 onDragEnd={handleSwipe}
-                // pt-16 and pb-32 give breathing room so flex-1 can perfectly scale the image without overlapping UI
                 className="absolute inset-0 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing w-full h-full px-4 pt-20 pb-32 md:pb-36"
               >
-                {/* Image Container (flex-1 + min-h-0 guarantees it dynamically shrinks to fit screen) */}
+                {/* Image Container */}
                 <div className="relative w-full max-w-5xl flex-1 min-h-0 mb-6 md:mb-10">
                   <Image
                     src={activeItem.imageUrl}
@@ -202,7 +211,7 @@ export default function Gallery() {
                   />
                 </div>
                 
-                {/* Text Container (shrink-0 guarantees text stays readable) */}
+                {/* Text Container */}
                 <div className="flex flex-col items-center text-center px-4 max-w-2xl shrink-0">
                   <span className="text-yellow-500 text-[10px] tracking-[0.4em] uppercase font-bold mb-3">
                     {activeItem.category}
@@ -219,8 +228,6 @@ export default function Gallery() {
 
             {/* Fixed Pagination Dock */}
             <div className="fixed bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 z-[110] flex items-center px-5 py-2.5 rounded-full bg-black/60 md:bg-white/10 backdrop-blur-xl border border-white/10 md:border-white/20 shadow-2xl">
-              
-              {/* Desktop Left Button */}
               <button 
                 onClick={() => paginate(-1)} 
                 className="hidden md:block text-white/50 hover:text-white transition-colors p-2 mr-4"
@@ -231,14 +238,12 @@ export default function Gallery() {
                 </svg>
               </button>
 
-              {/* Mobile Swipe Hint (Left) */}
               <div className="md:hidden flex items-center text-white/30 mr-4">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M15 18l-6-6 6-6" />
                 </svg>
               </div>
               
-              {/* Counter */}
               <div className="flex flex-col items-center justify-center min-w-[3rem]">
                 <span className="font-mono text-[10px] tracking-widest text-white font-semibold">
                   {String(lightboxIndex! + 1).padStart(2, "0")}
@@ -249,7 +254,6 @@ export default function Gallery() {
                 </span>
               </div>
               
-              {/* Desktop Right Button */}
               <button 
                 onClick={() => paginate(1)} 
                 className="hidden md:block text-white/50 hover:text-white transition-colors p-2 ml-4"
@@ -260,13 +264,11 @@ export default function Gallery() {
                 </svg>
               </button>
 
-              {/* Mobile Swipe Hint (Right) */}
               <div className="md:hidden flex items-center text-white/30 ml-4">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M9 18l6-6-6-6" />
                 </svg>
               </div>
-
             </div>
           </motion.div>
         )}

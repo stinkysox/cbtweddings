@@ -6,7 +6,6 @@ import { SectionWrapper } from "../../components/SectionWrapper";
 import Link from "next/link";
 import { siteContent } from "../../data/siteContent";
 import { TeamSection } from "../../components/TeamSection";
-
 export default function About() {
   const [isImageFocused, setIsImageFocused] = useState(false);
   const { about } = siteContent;
