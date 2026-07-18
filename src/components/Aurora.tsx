@@ -117,6 +117,18 @@ function isIOSSafari(): boolean {
   );
 }
 
+// Heuristic low-end device check. We treat the device as "low-end" when:
+// - it has 4 or fewer logical CPU cores (most budget phones & cheap laptops), OR
+// - the UA looks like a non-Apple mobile browser (where WebGL can be slow)
+// This is deliberately conservative — we'd rather show slightly softer aurora
+// than tank the UI thread on weak hardware.
+function isLowEndDevice(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const cores = (navigator as Navigator & { hardwareConcurrency?: number }).hardwareConcurrency ?? 4;
+  const isMobile = /Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  return cores <= 4 || isMobile;
+}
+
 export default function Aurora({
   colorA = [0.05, 0.3, 0.2],
   colorB = [0.2, 0.05, 0.4],
@@ -131,12 +143,20 @@ export default function Aurora({
   const [webGLActive, setWebGLActive] = useState(false);
 
   const [isIOS, setIsIOS] = useState(false);
+  const [lowEnd, setLowEnd] = useState(false);
   useEffect(() => {
     setIsIOS(isIOSSafari());
+    setLowEnd(isLowEndDevice());
   }, []);
 
-  const effectiveBlur = isIOS ? Math.min(blur, 18) : blur;
-  const softness = isIOS ? 0.22 : 0.12;
+  // Low-end devices get: halved blur (cheaper compositing), more softness
+  // (fewer tight gradients = less shader work), and a smaller render scale.
+  const effectiveBlur = isIOS ? Math.min(blur, 18) : lowEnd ? Math.min(blur, 24) : blur;
+  const softness = isIOS ? 0.22 : lowEnd ? 0.20 : 0.12;
+  // Caller's renderScale is treated as the *maximum*. On low-end we clamp to 0.15
+  // so the canvas is at most ~15% of container dimensions — tiny but more than
+  // enough since we blur it heavily anyway.
+  const effectiveRenderScale = lowEnd ? Math.min(renderScale, 0.15) : renderScale;
 
   const parsedColorA = parseColor(colorA);
   const parsedColorB = parseColor(colorB);
@@ -145,14 +165,14 @@ export default function Aurora({
   const colorBRef = useRef(parsedColorB);
   const speedRef = useRef(speed);
   const intensityRef = useRef(intensity);
-  const renderScaleRef = useRef(renderScale);
+  const renderScaleRef = useRef(effectiveRenderScale);
   const softnessRef = useRef(softness);
 
   colorARef.current = parsedColorA;
   colorBRef.current = parsedColorB;
   speedRef.current = speed;
   intensityRef.current = intensity;
-  renderScaleRef.current = renderScale;
+  renderScaleRef.current = effectiveRenderScale;
   softnessRef.current = softness;
 
   useEffect(() => {
@@ -222,11 +242,24 @@ export default function Aurora({
     let isIntersecting = true;
     let resizeTimeout: NodeJS.Timeout;
 
+    // MAX_PIXELS caps the total fragment count per frame. At renderScale=0.25
+    // a 1440-wide container would be 360×x — well under 200K on typical
+    // aspect ratios. On a 4K monitor with a large container it could push
+    // higher; the cap prevents that without the caller needing to know.
+    const MAX_PIXELS = 200_000;
+
     function resize() {
       if (!canvas || !container || !gl) return;
-      const scale = Math.min(Math.max(renderScaleRef.current, 0.05), 1);
-      const width = Math.max(1, Math.floor(container.clientWidth * scale));
-      const height = Math.max(1, Math.floor(container.clientHeight * scale));
+      let scale = Math.min(Math.max(renderScaleRef.current, 0.05), 1);
+      let width  = Math.max(1, Math.floor(container.clientWidth  * scale));
+      let height = Math.max(1, Math.floor(container.clientHeight * scale));
+
+      // If this scale would exceed our pixel budget, shrink proportionally.
+      if (width * height > MAX_PIXELS) {
+        const ratio = Math.sqrt(MAX_PIXELS / (width * height));
+        width  = Math.max(1, Math.floor(width  * ratio));
+        height = Math.max(1, Math.floor(height * ratio));
+      }
 
       if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width;
@@ -260,10 +293,22 @@ export default function Aurora({
       gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4);
     }
 
+    let lastTime = 0;
+    // Target 24 fps — imperceptible vs 60 fps for a slow ambient glow,
+    // but roughly halves the GPU time compared to running uncapped.
+    // Low-end devices drop to 20 fps for extra headroom.
+    const targetFps = lowEnd ? 20 : 24;
+    const fpsInterval = 1000 / targetFps;
+
     function loop(now: number) {
-      accumTime = now * 0.001 * speedRef.current;
-      drawFrame();
       if (running) rafId = requestAnimationFrame(loop);
+
+      const elapsed = now - lastTime;
+      if (elapsed > fpsInterval) {
+        lastTime = now - (elapsed % fpsInterval);
+        accumTime = now * 0.001 * speedRef.current;
+        drawFrame();
+      }
     }
 
     function start() {
