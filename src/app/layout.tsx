@@ -37,9 +37,9 @@ export const metadata: Metadata = {
     siteName: "CBT Weddings",
     images: [
       {
-        url: "https://i.postimg.cc/DZZdHH81/behance-img-13.jpg",
+        url: "https://i.postimg.cc/gJY27VJB/MAN09884.jpg",
         width: 1200,
-        height: 630,
+        height: 800,
         alt: "CBT Weddings Luxury Photography",
       },
     ],
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CBT Weddings | Luxury Wedding Storytelling",
     description: "CBT Weddings captures your luxury wedding moments with artistic storytelling and premium photography.",
-    images: ["https://i.postimg.cc/DZZdHH81/behance-img-13.jpg"],
+    images: ["https://i.postimg.cc/gJY27VJB/MAN09884.jpg"],
   },
 };
 
@@ -72,7 +72,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "CBT Weddings",
-    "image": "https://i.postimg.cc/DZZdHH81/behance-img-13.jpg",
+    "image": "https://i.postimg.cc/gJY27VJB/MAN09884.jpg",
     "@id": "https://www.cbtweddings.com",
     "url": "https://www.cbtweddings.com",
     "telephone": "+918800180670",
@@ -110,11 +110,18 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {/* Preconnect to image host for fast OG/social preview load */}
+        <link rel="preconnect" href="https://i.postimg.cc" />
+        {/* Preload the social preview image so crawlers and share cards get it fast */}
         <link
-          rel="icon"
-          type="image/jpeg"
-          href="https://i.pinimg.com/736x/ad/42/2d/ad422d9d993dfb6697b437b06dcd0cb3.jpg"
+          rel="preload"
+          as="image"
+          href="https://i.postimg.cc/gJY27VJB/MAN09884.jpg"
+          fetchPriority="high"
         />
+        {/* SVG favicon: black bg, white CBT text */}
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="shortcut icon" href="/favicon.svg" />
       </head>
       <body
         className={`${inter.variable} ${playfair.variable} antialiased selection:bg-yellow-600/30 font-sans`}
