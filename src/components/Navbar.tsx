@@ -52,9 +52,6 @@ export const Navbar: React.FC = () => {
               {siteContent.brand.name}
               <span className="text-yellow-500">.</span>
             </span>
-            <span className="hidden md:block text-[8px] tracking-[0.5em] uppercase text-white/40 font-medium mt-1">
-              Est. Cinematography
-            </span>
           </Link>
 
           {/* Desktop Navigation */}
