@@ -72,7 +72,7 @@ const FRAGMENT_SRC = `
 function compileShader(
   gl: WebGLRenderingContext,
   type: number,
-  source: string
+  source: string,
 ): WebGLShader | null {
   const shader = gl.createShader(type);
   if (!shader) return null;
@@ -89,7 +89,10 @@ function compileShader(
 function isIOSSafari(): boolean {
   if (typeof navigator === "undefined") return false;
   const ua = navigator.userAgent;
-  return /iP(ad|hone|od)/.test(ua) || (ua.includes("Macintosh") && navigator.maxTouchPoints > 1);
+  return (
+    /iP(ad|hone|od)/.test(ua) ||
+    (ua.includes("Macintosh") && navigator.maxTouchPoints > 1)
+  );
 }
 
 export default function Aurora({
@@ -126,7 +129,9 @@ export default function Aurora({
     const canvas = canvasRef.current;
     if (!container || !canvas) return;
 
-    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const reducedMotionQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
     if (reducedMotionQuery.matches) return;
 
     const glOptions = {
@@ -137,7 +142,10 @@ export default function Aurora({
     };
 
     const gl = (canvas.getContext("webgl", glOptions) ||
-      canvas.getContext("experimental-webgl", glOptions)) as WebGLRenderingContext | null;
+      canvas.getContext(
+        "experimental-webgl",
+        glOptions,
+      )) as WebGLRenderingContext | null;
 
     if (!gl) return;
     setWebGLActive(true);
@@ -160,9 +168,9 @@ export default function Aurora({
     gl.bufferData(
       gl.ARRAY_BUFFER,
       new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
-      gl.STATIC_DRAW
+      gl.STATIC_DRAW,
     );
-    
+
     const aPosition = gl.getAttribLocation(program, "aPosition");
     gl.enableVertexAttribArray(aPosition);
     gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0);
@@ -188,7 +196,7 @@ export default function Aurora({
       const scale = Math.min(Math.max(renderScaleRef.current, 0.05), 1);
       const width = Math.max(1, Math.floor(container.clientWidth * scale));
       const height = Math.max(1, Math.floor(container.clientHeight * scale));
-      
+
       if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width;
         canvas.height = height;
@@ -203,8 +211,18 @@ export default function Aurora({
     };
 
     function drawFrame() {
-      gl!.uniform3f(uColorA, colorARef.current[0], colorARef.current[1], colorARef.current[2]);
-      gl!.uniform3f(uColorB, colorBRef.current[0], colorBRef.current[1], colorBRef.current[2]);
+      gl!.uniform3f(
+        uColorA,
+        colorARef.current[0],
+        colorARef.current[1],
+        colorARef.current[2],
+      );
+      gl!.uniform3f(
+        uColorB,
+        colorBRef.current[0],
+        colorBRef.current[1],
+        colorBRef.current[2],
+      );
       gl!.uniform1f(uIntensity, intensityRef.current);
       gl!.uniform1f(uSoftness, softness);
       gl!.uniform1f(uTime, accumTime);
@@ -212,7 +230,7 @@ export default function Aurora({
     }
 
     function loop(now: number) {
-      accumTime = (now * 0.001) * speedRef.current;
+      accumTime = now * 0.001 * speedRef.current;
       drawFrame();
       if (running) rafId = requestAnimationFrame(loop);
     }
@@ -237,9 +255,9 @@ export default function Aurora({
           start();
         }
       },
-      { threshold: 0 }
+      { threshold: 0 },
     );
-    
+
     intersectionObserver.observe(canvas);
 
     function onVisibilityChange() {
@@ -253,12 +271,12 @@ export default function Aurora({
       e.preventDefault();
       stop();
     }
-    
+
     function onContextRestored() {
       resize();
       start();
     }
-    
+
     canvas.addEventListener("webglcontextlost", onContextLost as EventListener);
     canvas.addEventListener("webglcontextrestored", onContextRestored);
 
@@ -273,7 +291,10 @@ export default function Aurora({
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
       document.removeEventListener("visibilitychange", onVisibilityChange);
-      canvas.removeEventListener("webglcontextlost", onContextLost as EventListener);
+      canvas.removeEventListener(
+        "webglcontextlost",
+        onContextLost as EventListener,
+      );
       canvas.removeEventListener("webglcontextrestored", onContextRestored);
       gl.deleteProgram(program);
       gl.deleteShader(vertexShader);
