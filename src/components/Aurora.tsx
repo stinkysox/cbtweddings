@@ -1,24 +1,17 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export interface AuroraProps {
-  /** Left-side glow color, as an [R, G, B] triplet in 0-1 range. */
   colorA?: [number, number, number];
-  /** Right-side glow color, as an [R, G, B] triplet in 0-1 range. */
   colorB?: [number, number, number];
-  /** How fast the glows drift. 1 = default speed. */
   speed?: number;
-  /** Overall brightness/opacity multiplier, roughly 0-2. */
   intensity?: number;
   blur?: number;
   renderScale?: number;
   className?: string;
 }
 
-// OPTIMIZATION 1: The Vertex Shader now handles all the heavy lifting.
-// It calculates the movement and pulsing only 4 times per frame, 
-// then passes the results (vCenterA, vPulseA, etc.) to the fragment shader.
 const VERTEX_SRC = `
   attribute vec2 aPosition;
   uniform float uTime;
@@ -31,8 +24,6 @@ const VERTEX_SRC = `
   void main() {
     float t = uTime * 0.15;
 
-    // OPTIMIZATION 2: Replaced expensive 2D noise with cheap Sine/Cosine waves.
-    // This creates a smoother, continuous orbital drift.
     float driftAx = sin(t * 1.3) * 0.36 - 0.18;
     float driftAy = cos(t * 0.9) * 0.14 - 0.07;
     float driftBx = sin(t * 1.1 + 2.0) * 0.36 - 0.18;
@@ -48,8 +39,6 @@ const VERTEX_SRC = `
   }
 `;
 
-// OPTIMIZATION 3: The Fragment Shader is now extremely lightweight.
-// It only calculates the distance falloff for the pixels.
 const FRAGMENT_SRC = `
   precision mediump float;
 
@@ -57,6 +46,7 @@ const FRAGMENT_SRC = `
   uniform vec3 uColorA;
   uniform vec3 uColorB;
   uniform float uIntensity;
+  uniform float uSoftness;
 
   varying vec2 vCenterA;
   varying vec2 vCenterB;
@@ -69,8 +59,8 @@ const FRAGMENT_SRC = `
     float distA = length((uv - vCenterA) * vec2(1.0, 1.55));
     float distB = length((uv - vCenterB) * vec2(1.0, 1.55));
 
-    float glowA = smoothstep(0.9 + vPulseA, 0.0, distA);
-    float glowB = smoothstep(0.9 + vPulseB, 0.0, distB);
+    float glowA = smoothstep(0.9 + vPulseA + uSoftness, -uSoftness, distA);
+    float glowB = smoothstep(0.9 + vPulseB + uSoftness, -uSoftness, distB);
 
     vec3 col = uColorA * glowA + uColorB * glowB;
     float alpha = clamp(glowA + glowB, 0.0, 1.0) * uIntensity;
@@ -96,51 +86,61 @@ function compileShader(
   return shader;
 }
 
+function isIOSSafari(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent;
+  return /iP(ad|hone|od)/.test(ua) || (ua.includes("Macintosh") && navigator.maxTouchPoints > 1);
+}
+
 export default function Aurora({
-  colorA = [0.05, 0.3, 0.2], // Darker, richer green
-  colorB = [0.2, 0.05, 0.4], // Darker, richer violet
-  intensity = 1,           // Lo  wer intensity reduces the white "blown out" center
+  colorA = [0.05, 0.3, 0.2],
+  colorB = [0.2, 0.05, 0.4],
+  intensity = 1,
   speed = 2,
   blur = 60,
-  renderScale = 0.25, // Lowered from 0.35. Less pixels to draw, visually identical due to blur.
+  renderScale = 0.25,
   className = "",
 }: AuroraProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [webGLActive, setWebGLActive] = useState(false);
 
   const colorARef = useRef(colorA);
   const colorBRef = useRef(colorB);
   const speedRef = useRef(speed);
   const intensityRef = useRef(intensity);
   const renderScaleRef = useRef(renderScale);
-  
+
   colorARef.current = colorA;
   colorBRef.current = colorB;
   speedRef.current = speed;
   intensityRef.current = intensity;
   renderScaleRef.current = renderScale;
 
+  const iOS = typeof window !== "undefined" && isIOSSafari();
+  const effectiveBlur = iOS ? Math.min(blur, 18) : blur;
+  const softness = iOS ? 0.22 : 0.12;
+
   useEffect(() => {
     const container = containerRef.current;
     const canvas = canvasRef.current;
     if (!container || !canvas) return;
 
-    const reducedMotionQuery = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    );
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (reducedMotionQuery.matches) return;
 
-    // Added low-power preference to prevent waking up dedicated GPUs unnecessarily
     const glOptions = {
       alpha: true,
       antialias: false,
       premultipliedAlpha: true,
-      powerPreference: "low-power", 
+      powerPreference: "low-power" as WebGLPowerPreference,
     };
 
     const gl = (canvas.getContext("webgl", glOptions) ||
       canvas.getContext("experimental-webgl", glOptions)) as WebGLRenderingContext | null;
 
     if (!gl) return;
+    setWebGLActive(true);
 
     const vertexShader = compileShader(gl, gl.VERTEX_SHADER, VERTEX_SRC);
     const fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, FRAGMENT_SRC);
@@ -162,6 +162,7 @@ export default function Aurora({
       new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
       gl.STATIC_DRAW
     );
+    
     const aPosition = gl.getAttribLocation(program, "aPosition");
     gl.enableVertexAttribArray(aPosition);
     gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0);
@@ -171,21 +172,23 @@ export default function Aurora({
     const uColorA = gl.getUniformLocation(program, "uColorA");
     const uColorB = gl.getUniformLocation(program, "uColorB");
     const uIntensity = gl.getUniformLocation(program, "uIntensity");
+    const uSoftness = gl.getUniformLocation(program, "uSoftness");
 
     gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
     let rafId = 0;
     let running = false;
-    let lastFrameTime = performance.now();
     let accumTime = 0;
     let isIntersecting = true;
+    let resizeTimeout: NodeJS.Timeout;
 
     function resize() {
       if (!canvas || !container || !gl) return;
       const scale = Math.min(Math.max(renderScaleRef.current, 0.05), 1);
       const width = Math.max(1, Math.floor(container.clientWidth * scale));
       const height = Math.max(1, Math.floor(container.clientHeight * scale));
+      
       if (canvas.width !== width || canvas.height !== height) {
         canvas.width = width;
         canvas.height = height;
@@ -194,18 +197,22 @@ export default function Aurora({
       }
     }
 
+    const debouncedResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(resize, 100);
+    };
+
     function drawFrame() {
       gl!.uniform3f(uColorA, colorARef.current[0], colorARef.current[1], colorARef.current[2]);
       gl!.uniform3f(uColorB, colorBRef.current[0], colorBRef.current[1], colorBRef.current[2]);
       gl!.uniform1f(uIntensity, intensityRef.current);
+      gl!.uniform1f(uSoftness, softness);
       gl!.uniform1f(uTime, accumTime);
       gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4);
     }
 
     function loop(now: number) {
-      const dt = Math.min((now - lastFrameTime) / 1000, 0.1);
-      lastFrameTime = now;
-      accumTime += dt * speedRef.current;
+      accumTime = (now * 0.001) * speedRef.current;
       drawFrame();
       if (running) rafId = requestAnimationFrame(loop);
     }
@@ -213,7 +220,6 @@ export default function Aurora({
     function start() {
       if (running) return;
       running = true;
-      lastFrameTime = performance.now();
       rafId = requestAnimationFrame(loop);
     }
 
@@ -222,19 +228,10 @@ export default function Aurora({
       cancelAnimationFrame(rafId);
     }
 
-    function applyMotionPreference() {
-      if (reducedMotionQuery.matches) {
-        stop();
-        drawFrame();
-      } else if (isIntersecting && !document.hidden) {
-        start();
-      }
-    }
-
     const intersectionObserver = new IntersectionObserver(
       ([entry]) => {
         isIntersecting = entry.isIntersecting;
-        if (!isIntersecting || document.hidden || reducedMotionQuery.matches) {
+        if (!isIntersecting || document.hidden) {
           stop();
         } else {
           start();
@@ -242,41 +239,40 @@ export default function Aurora({
       },
       { threshold: 0 }
     );
+    
     intersectionObserver.observe(canvas);
 
     function onVisibilityChange() {
-      if (document.hidden) {
-        stop();
-      } else if (isIntersecting && !reducedMotionQuery.matches) {
-        start();
-      }
+      if (document.hidden) stop();
+      else if (isIntersecting) start();
     }
-    
+
     document.addEventListener("visibilitychange", onVisibilityChange);
-    reducedMotionQuery.addEventListener("change", applyMotionPreference);
 
     function onContextLost(e: Event) {
       e.preventDefault();
       stop();
     }
+    
     function onContextRestored() {
       resize();
       start();
     }
+    
     canvas.addEventListener("webglcontextlost", onContextLost as EventListener);
     canvas.addEventListener("webglcontextrestored", onContextRestored);
 
-    const resizeObserver = new ResizeObserver(resize);
+    const resizeObserver = new ResizeObserver(debouncedResize);
     resizeObserver.observe(container);
     resize();
-    applyMotionPreference();
+    start();
 
     return () => {
       stop();
+      clearTimeout(resizeTimeout);
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
       document.removeEventListener("visibilitychange", onVisibilityChange);
-      reducedMotionQuery.removeEventListener("change", applyMotionPreference);
       canvas.removeEventListener("webglcontextlost", onContextLost as EventListener);
       canvas.removeEventListener("webglcontextrestored", onContextRestored);
       gl.deleteProgram(program);
@@ -284,41 +280,51 @@ export default function Aurora({
       gl.deleteShader(fragmentShader);
       gl.deleteBuffer(positionBuffer);
     };
-  }, []);
+  }, [softness]);
 
   return (
     <div
       ref={containerRef}
-      className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}
+      className={`pointer-events-none absolute top-0 left-0 w-full h-full overflow-hidden ${className}`}
+      style={{ isolation: "isolate", contain: "strict" }}
       aria-hidden="true"
     >
       <canvas
         ref={canvasRef}
         className="h-full w-full"
-        style={{ filter: `blur(${blur}px)`, willChange: "transform" }}
-      />
-
-      <div
-        className="aurora-fallback absolute inset-0 -z-10 opacity-90"
         style={{
-          background:
-            "radial-gradient(45% 55% at 16% -5%, rgba(166,200,255,0.4), transparent 70%), radial-gradient(45% 55% at 84% -5%, rgba(224,187,228,0.4), transparent 70%)",
-          filter: "blur(50px)",
-          willChange: "transform",
+          filter: `blur(${effectiveBlur}px)`,
+          WebkitFilter: `blur(${effectiveBlur}px)`,
+          transform: "translateZ(0)",
+          opacity: webGLActive ? 1 : 0,
+          transition: "opacity 0.5s ease-in",
         }}
       />
-      <style>{`
-        .aurora-fallback {
-          animation: aurora-drift 14s ease-in-out infinite alternate;
-        }
-        @keyframes aurora-drift {
-          0%   { transform: translate3d(-2%, 0, 0) scale(1); }
-          100% { transform: translate3d(2%, 2%, 0) scale(1.05); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .aurora-fallback { animation: none; }
-        }
-      `}</style>
+
+      {!webGLActive && (
+        <>
+          <div
+            className="aurora-fallback absolute inset-0 -z-10 opacity-90"
+            style={{
+              background:
+                "radial-gradient(45% 55% at 16% -5%, rgba(166,200,255,0.4), rgba(0,0,0,0) 70%), radial-gradient(45% 55% at 84% -5%, rgba(224,187,228,0.4), rgba(0,0,0,0) 70%)",
+              filter: "blur(50px)",
+            }}
+          />
+          <style>{`
+            .aurora-fallback {
+              animation: aurora-drift 14s ease-in-out infinite alternate;
+            }
+            @keyframes aurora-drift {
+              0%   { transform: translate3d(-2%, 0, 0) scale(1); }
+              100% { transform: translate3d(2%, 2%, 0) scale(1.05); }
+            }
+            @media (prefers-reduced-motion: reduce) {
+              .aurora-fallback { animation: none; }
+            }
+          `}</style>
+        </>
+      )}
     </div>
   );
 }

@@ -31,26 +31,35 @@ const Bubble: React.FC<{
   const start = config.range[0];
   const end = config.range[1];
   const mid = (start + end) / 2;
+  const riseEnd = Math.min(start + 0.2, end);
 
-  // Derived directly from the ONE shared smoothed progress value —
-  // no per-bubble springs, so nothing extra to simulate per frame.
-  const opacity = useTransform(progress, [start, start + 0.15, end - 0.15, end], [0, 1, 1, 0]);
-  const scale = useTransform(progress, [start, mid, end], [0.6, 1.8, 0.6]);
+  const opacity = useTransform(progress, [start, riseEnd, end - 0.15, end], [0, 1, 1, 0]);
+  const scale = useTransform(progress, [start, mid, end], [0.7, 1.15, 0.7]);
   const driftX = useTransform(progress, [start, end], ["0%", `${config.drift.x}%`]);
-  const driftY = useTransform(progress, [start, end], ["0%", `${config.drift.y}%`]);
+  const driftY = useTransform(
+    progress,
+    [start, riseEnd, end],
+    ["140%", "0%", `${config.drift.y}%`]
+  );
 
-  // Fluid, CSS-resolved size — no JS mobile detection, no post-mount
-  // resize flash. Scales smoothly between a mobile floor and desktop cap.
-  const floor = config.size * 0.45;
-  const sizeStyle = `clamp(${floor}px, ${(config.size / 1440) * 100}vw, ${config.size}px)`;
+  // FIX: floor was size * 0.3, which pushed most bubbles down to ~130-230px
+  // on a typical ~390px-wide phone — too small to register as a real
+  // visual element (per screenshot). Bumped to size * 0.55 so bubbles read
+  // clearly on mobile, and switched the responsive term from a fixed
+  // 1440px basis to 45vw, so sizing tracks the actual viewport instead of
+  // one fixed floor number — bigger phones (e.g. tablets in portrait) get
+  // slightly larger bubbles than small phones, rather than everything
+  // pinning to the same floor value.
+  const floor = config.size * 0.55;
+  const sizeStyle = `clamp(${floor}px, 45vw, ${config.size}px)`;
 
   return (
     <div
       className={config.priority ? undefined : "hidden xs:block"}
       style={{
         position: "absolute",
-        left: `clamp(8%, ${config.x}, 92%)`,
-        top: config.y,
+        left: `clamp(12%, ${config.x}, 88%)`,
+        top: `clamp(20%, ${config.y}, 82%)`,
         width: sizeStyle,
         height: sizeStyle,
         transform: "translate(-50%, -50%)",
@@ -183,11 +192,11 @@ export const BubbleScroll: React.FC = () => {
     // Only pick images from these categories as per request
     const validCategories = ["Wedding", "Pre-Wedding", "Engagement", "Rituals"];
     const filteredImages = GALLERY_DATA.filter((item) => validCategories.includes(item.category));
-    
+
     // Shuffle and take 8
     const shuffled = [...filteredImages].sort(() => 0.5 - Math.random());
     const selected = shuffled.slice(0, 8).map(item => item.imageUrl);
-    
+
     // Fallback if not enough images
     while (selected.length > 0 && selected.length < 8) {
       selected.push(selected[Math.floor(Math.random() * selected.length)]);
@@ -215,14 +224,14 @@ export const BubbleScroll: React.FC = () => {
   const bubbles: BubbleConfig[] = useMemo(() => {
     if (randomImages.length < 8) return [];
     return [
-      { url: randomImages[0], size: 500, x: "15%", y: "30%", range: [0, 0.4], drift: { x: 50, y: -80 }, priority: true },
-      { url: randomImages[1], size: 350, x: "70%", y: "25%", range: [0.1, 0.5], drift: { x: -40, y: -60 }, priority: true },
-      { url: randomImages[2], size: 420, x: "30%", y: "60%", range: [0.25, 0.65], drift: { x: 60, y: -100 }, priority: true },
-      { url: randomImages[3], size: 280, x: "80%", y: "45%", range: [0.35, 0.75], drift: { x: -80, y: -70 } },
-      { url: randomImages[4], size: 480, x: "10%", y: "50%", range: [0.5, 0.85], drift: { x: 100, y: -90 }, priority: true },
-      { url: randomImages[5], size: 380, x: "65%", y: "70%", range: [0.6, 0.95], drift: { x: -30, y: -120 } },
-      { url: randomImages[6], size: 400, x: "25%", y: "75%", range: [0.75, 1.0], drift: { x: 40, y: -90 }, priority: true },
-      { url: randomImages[7], size: 520, x: "60%", y: "20%", range: [0.8, 1.0], drift: { x: -60, y: -150 } },
+      { url: randomImages[0], size: 360, x: "15%", y: "32%", range: [0, 0.4], drift: { x: 50, y: -80 }, priority: true },
+      { url: randomImages[1], size: 260, x: "72%", y: "28%", range: [0.1, 0.5], drift: { x: -40, y: -60 }, priority: true },
+      { url: randomImages[2], size: 310, x: "28%", y: "60%", range: [0.25, 0.65], drift: { x: 60, y: -100 }, priority: true },
+      { url: randomImages[3], size: 220, x: "82%", y: "45%", range: [0.35, 0.75], drift: { x: -80, y: -70 } },
+      { url: randomImages[4], size: 340, x: "10%", y: "50%", range: [0.5, 0.85], drift: { x: 100, y: -90 }, priority: true },
+      { url: randomImages[5], size: 280, x: "68%", y: "70%", range: [0.6, 0.95], drift: { x: -30, y: -120 } },
+      { url: randomImages[6], size: 300, x: "25%", y: "75%", range: [0.75, 1.0], drift: { x: 40, y: -90 }, priority: true },
+      { url: randomImages[7], size: 380, x: "60%", y: "25%", range: [0.8, 1.0], drift: { x: -60, y: -150 } },
     ];
   }, [randomImages]);
 

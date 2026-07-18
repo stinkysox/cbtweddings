@@ -120,7 +120,6 @@ export default function RootLayout({
         className={`${inter.variable} ${playfair.variable} antialiased selection:bg-yellow-600/30 font-sans`}
         suppressHydrationWarning
       >
-        <CustomCursor />
         <VinylPlayer />
         <div className="flex flex-col min-h-screen relative">
           <Navbar />

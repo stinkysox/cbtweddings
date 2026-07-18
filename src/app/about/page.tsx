@@ -102,23 +102,43 @@ export default function About() {
             </p>
           </SectionWrapper>
 
-          <div className="grid md:grid-cols-3 gap-12">
+          <div className="grid md:grid-cols-3 gap-8 md:gap-10">
             {about.pillars.items.map((pillar, i) => (
               <SectionWrapper key={i} delay={i * 0.15}>
+                {/*
+                  FIX: previously this animated `backgroundColor` directly
+                  via whileHover on top of a `glass` (backdrop-blur) class.
+                  Animating an rgba background on a blurred element forces
+                  the browser to recompute the blur every tick of the
+                  transition, which reads as a flicker/jank on hover —
+                  likely what "looks odd" here. Hover feedback is now a
+                  pure transform (y-lift) plus a Tailwind `group-hover`
+                  border-color change, both of which are cheap and don't
+                  fight with the blur.
+                */}
                 <motion.div
-                  whileHover={{
-                    y: -10,
-                    backgroundColor: "rgba(255, 255, 255, 0.08)",
-                  }}
+                  whileHover={{ y: -10 }}
                   whileTap={{ scale: 0.98 }}
-                  className="p-12 glass rounded-[3rem] border border-white/10 h-full transition-colors duration-500 cursor-pointer"
+                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                  className="group relative p-10 md:p-12 glass rounded-[3rem] border border-white/10 hover:border-yellow-600/30 h-full transition-colors duration-500 cursor-pointer overflow-hidden"
                 >
+                  {/* Numbered index — gives each card a visual anchor and
+                      matches the numbering pattern already used in the
+                      Archive section below, for consistency. */}
+                  <span className="block text-[11px] font-mono tracking-[0.3em] text-yellow-600/50 group-hover:text-yellow-600 transition-colors mb-8">
+                    0{i + 1}
+                  </span>
+
                   <h4 className="text-3xl font-serif italic mb-6 text-yellow-600">
                     {pillar.title}
                   </h4>
                   <p className="premium-para !text-zinc-400">
                     {pillar.desc}
                   </p>
+
+                  {/* Subtle static corner glow instead of an animated fill —
+                      reads as premium without any per-frame repaint cost. */}
+                  <div className="pointer-events-none absolute -bottom-16 -right-16 w-40 h-40 rounded-full bg-yellow-600/0 group-hover:bg-yellow-600/[0.06] blur-3xl transition-all duration-700" />
                 </motion.div>
               </SectionWrapper>
             ))}

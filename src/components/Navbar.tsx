@@ -60,7 +60,10 @@ export const Navbar: React.FC = () => {
           </Link>
 
           {/* Desktop Layout Navigation Links */}
-          <div className="hidden md:flex items-center gap-2 z-10">
+          <div
+            className="hidden md:flex items-center gap-2 z-10"
+            onMouseLeave={() => setHovered(null)}
+          >
             {navigationLinks.map((link) => {
               const isActive = pathname === link.path;
               return (
@@ -68,23 +71,45 @@ export const Navbar: React.FC = () => {
                   key={link.path}
                   href={link.path}
                   onMouseEnter={() => setHovered(link.path)}
-                  onMouseLeave={() => setHovered(null)}
                   className="relative px-5 py-2 text-[10px] tracking-[0.25em] uppercase font-semibold transition-colors duration-300 text-white/70 hover:text-white"
                 >
-                  {hovered === link.path && (
-                    <motion.span
-                      layoutId="nav-hover-pill"
-                      className="absolute inset-0 rounded-full bg-white/[0.06] border border-white/5"
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    />
-                  )}
-                  <span className={isActive ? "text-yellow-500 dark:text-yellow-400" : ""}>
+                  {/* FIX: wrapped in AnimatePresence with an explicit exit
+                      animation. Previously this pill only had enter/move
+                      behavior via layoutId — when the mouse left the whole
+                      nav (hovered -> null), it had no exit transition and
+                      just vanished instantly, which read as a glitch. Now
+                      it fades + scales down smoothly on the way out too. */}
+                  <AnimatePresence>
+                    {hovered === link.path && (
+                      <motion.span
+                        layoutId="nav-hover-pill"
+                        className="absolute inset-0 rounded-full bg-white/[0.06] border border-white/5"
+                        initial={{ opacity: 0, scale: 0.85 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.85 }}
+                        transition={{
+                          layout: { type: "spring", stiffness: 500, damping: 35 },
+                          opacity: { duration: 0.15 },
+                          scale: { duration: 0.15 },
+                        }}
+                      />
+                    )}
+                  </AnimatePresence>
+                  <span
+                    className={`relative z-10 ${
+                      isActive ? "text-yellow-500 dark:text-yellow-400" : ""
+                    }`}
+                  >
                     {link.name}
                   </span>
                   {isActive && (
-                    <motion.span 
+                    <motion.span
                       layoutId="active-indicator"
-                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-yellow-500" 
+                      // FIX: bumped above the hover pill (z-10) so the dot
+                      // never gets visually muddied underneath the pill's
+                      // background/border when the active link is also
+                      // hovered — it now always reads on top, clearly.
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-yellow-500 z-20"
                     />
                   )}
                 </Link>
@@ -184,7 +209,7 @@ export const Navbar: React.FC = () => {
               >
                 {siteContent.navbar.cta.text}
               </Link>
-              
+
               <span className="text-[9px] tracking-[0.4em] uppercase text-white/20 font-medium">
                 © {new Date().getFullYear()} {siteContent.brand.name}
               </span>
