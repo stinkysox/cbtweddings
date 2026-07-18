@@ -108,21 +108,46 @@ export default function Aurora({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [webGLActive, setWebGLActive] = useState(false);
 
+  // FIX (hydration mismatch): iOS detection used to run inline during
+  // render via `typeof window !== "undefined" && isIOSSafari()`. That's a
+  // server/client render branch — on the server `window` is undefined so
+  // it evaluates to false, but on the client the *very first* render pass
+  // (the one React reconciles against the server HTML) already has
+  // `window`, so it can evaluate to true before hydration completes. That
+  // mismatch is exactly what produced the "tree hydrated but attributes
+  // didn't match" error on the canvas's inline style (blur, transform,
+  // opacity, transition all diffed as a result).
+  //
+  // Fix: never let iOS detection affect the first render's output. Detect
+  // it only inside an effect (client-only, runs after hydration), and
+  // store it in state so the first render — server and client alike —
+  // always uses the same non-iOS defaults.
+  const [isIOS, setIsIOS] = useState(false);
+  useEffect(() => {
+    setIsIOS(isIOSSafari());
+  }, []);
+
+  const effectiveBlur = isIOS ? Math.min(blur, 18) : blur;
+  const softness = isIOS ? 0.22 : 0.12;
+
   const colorARef = useRef(colorA);
   const colorBRef = useRef(colorB);
   const speedRef = useRef(speed);
   const intensityRef = useRef(intensity);
   const renderScaleRef = useRef(renderScale);
+  // softness now lives in a ref too, read fresh each frame in drawFrame.
+  // This means the WebGL setup effect below no longer needs `softness` in
+  // its dependency array, so detecting iOS a beat after mount doesn't
+  // tear down and rebuild the GL context — it just changes what value
+  // gets uploaded to the shader on the next frame.
+  const softnessRef = useRef(softness);
 
   colorARef.current = colorA;
   colorBRef.current = colorB;
   speedRef.current = speed;
   intensityRef.current = intensity;
   renderScaleRef.current = renderScale;
-
-  const iOS = typeof window !== "undefined" && isIOSSafari();
-  const effectiveBlur = iOS ? Math.min(blur, 18) : blur;
-  const softness = iOS ? 0.22 : 0.12;
+  softnessRef.current = softness;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -224,7 +249,7 @@ export default function Aurora({
         colorBRef.current[2],
       );
       gl!.uniform1f(uIntensity, intensityRef.current);
-      gl!.uniform1f(uSoftness, softness);
+      gl!.uniform1f(uSoftness, softnessRef.current);
       gl!.uniform1f(uTime, accumTime);
       gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4);
     }
@@ -301,7 +326,9 @@ export default function Aurora({
       gl.deleteShader(fragmentShader);
       gl.deleteBuffer(positionBuffer);
     };
-  }, [softness]);
+    // Runs once on mount. softness is read from softnessRef inside the
+    // loop, so it no longer needs to be a dependency here.
+  }, []);
 
   return (
     <div

@@ -6,7 +6,6 @@ import {
   useScroll,
   useTransform,
   useSpring,
-  useMotionValue,
   useReducedMotion,
   MotionValue,
 } from "framer-motion";
@@ -92,92 +91,41 @@ const Bubble: React.FC<{
 });
 Bubble.displayName = "Bubble";
 
-const ScrollIndicator: React.FC<{ progress: MotionValue<number> }> = ({ progress }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const springConfig = { damping: 20, stiffness: 150 };
-  const springX = useSpring(x, springConfig);
-  const springY = useSpring(y, springConfig);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!containerRef.current) return;
-    const { clientX, clientY } = e;
-    const { left, top, width, height } = containerRef.current.getBoundingClientRect();
-    x.set((clientX - (left + width / 2)) * 0.4);
-    y.set((clientY - (top + height / 2)) * 0.4);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
-  const opacity = useTransform(progress, [0, 0.05, 0.95, 1], [0, 1, 1, 0]);
-  const rotate = useTransform(progress, [0, 1], [0, 360]);
+/**
+ * Sleek glass progress bar, fixed to the very top of the viewport.
+ * — 3px tall, pointer-events-none, sits above the navbar (z-[70]) so it
+ *   can never intercept a click regardless of the navbar's own z-index.
+ * — Tracks the SAME `progress` MotionValue the bubbles use, so it reflects
+ *   this section's scroll range specifically, not the whole page.
+ * — Fades in/out at the section's edges instead of snapping, mirroring
+ *   how the old indicator entered/exited.
+ * — Track is a frosted hairline (backdrop-blur + low-opacity white); fill
+ *   is a soft gold gradient with a small blurred "glow" riding its edge,
+ *   which is what reads as "glass" rather than a flat loading bar.
+ */
+const ScrollProgressBar: React.FC<{ progress: MotionValue<number> }> = ({ progress }) => {
+  const opacity = useTransform(progress, [0, 0.03, 0.97, 1], [0, 1, 1, 0]);
+  const glowLeft = useTransform(progress, [0, 1], ["0%", "100%"]);
 
   return (
     <motion.div
       style={{ opacity }}
-      className="absolute bottom-12 right-12 md:right-24 z-50 flex flex-col items-center gap-4 pointer-events-auto"
+      className="fixed top-0 left-0 right-0 z-[70] h-[3px] pointer-events-none"
     >
-      {/* Magnetic mouse-follow only makes sense with a cursor — desktop only */}
-      <div
-        ref={containerRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        className="relative w-20 h-20 hidden md:flex items-center justify-center cursor-pointer group"
-      >
-        <motion.div
-          style={{ x: springX, y: springY }}
-          className="relative w-full h-full flex items-center justify-center"
-        >
-          <svg className="w-full h-full -rotate-90">
-            <circle cx="40" cy="40" r="36" fill="none" stroke="white" strokeWidth="0.5" className="opacity-10" />
-            <motion.circle
-              cx="40"
-              cy="40"
-              r="36"
-              fill="none"
-              stroke="#ca8a04"
-              strokeWidth="1.5"
-              strokeDasharray="226"
-              style={{ pathLength: progress }}
-            />
-          </svg>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-1.5 h-1.5 bg-yellow-600 rounded-full shadow-[0_0_12px_rgba(202,138,4,0.6)] animate-pulse" />
-          </div>
-          <motion.div
-            style={{ rotate }}
-            className="absolute inset-0 rounded-full border border-dashed border-white/5 group-hover:border-yellow-600/20 transition-colors"
-          />
-        </motion.div>
-      </div>
+      {/* frosted track */}
+      <div className="absolute inset-0 bg-white/[0.05] backdrop-blur-sm border-b border-white/5" />
 
-      {/* Static, cheap fallback ring for touch devices */}
-      <div className="md:hidden relative w-14 h-14 flex items-center justify-center">
-        <svg className="w-full h-full -rotate-90">
-          <circle cx="28" cy="28" r="24" fill="none" stroke="white" strokeWidth="0.5" className="opacity-10" />
-          <motion.circle
-            cx="28"
-            cy="28"
-            r="24"
-            fill="none"
-            stroke="#ca8a04"
-            strokeWidth="1.5"
-            strokeDasharray="151"
-            style={{ pathLength: progress }}
-          />
-        </svg>
-        <div className="absolute w-1.5 h-1.5 bg-yellow-600 rounded-full shadow-[0_0_12px_rgba(202,138,4,0.6)] animate-pulse" />
-      </div>
+      {/* fill */}
+      <motion.div
+        style={{ scaleX: progress, transformOrigin: "left" }}
+        className="absolute inset-0 bg-gradient-to-r from-yellow-600/30 via-yellow-500/80 to-yellow-300"
+      />
 
-      <div className="flex flex-col items-center gap-1.5">
-        <span className="text-[9px] uppercase tracking-[0.5em] font-bold text-yellow-600/70">Scroll</span>
-        <div className="w-px h-6 bg-gradient-to-b from-yellow-600/60 to-transparent" />
-      </div>
+      {/* soft glow riding the leading edge */}
+      <motion.div
+        style={{ left: glowLeft, top: "50%" }}
+        className="absolute -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-yellow-300/80 blur-[6px]"
+      />
     </motion.div>
   );
 };
@@ -281,9 +229,9 @@ export const BubbleScroll: React.FC = () => {
             <Bubble key={i} config={bubble} progress={progress} index={i} />
           ))}
         </div>
-
-        <ScrollIndicator progress={progress} />
       </div>
+
+      <ScrollProgressBar progress={progress} />
     </section>
   );
 };
