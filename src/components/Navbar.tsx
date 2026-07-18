@@ -9,7 +9,6 @@ import { siteContent } from "../data/siteContent";
 export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [hovered, setHovered] = useState<string | null>(null);
   const pathname = usePathname();
   const { scrollY } = useScroll();
 
@@ -24,19 +23,18 @@ export const Navbar: React.FC = () => {
     };
   }, [isOpen]);
 
-  // Safely normalizes nav order: keeps layout intact while putting Contact then Wedding at the absolute end
   const navigationLinks = useMemo(() => {
     const rawLinks = siteContent.navbar?.links || [];
     const baseLinks = rawLinks.filter(
-      (l) => l.name.toLowerCase() !== "contact" && l.name.toLowerCase() !== "wedding"
+      (l) => !["contact", "wedding"].includes(l.name.toLowerCase())
     );
-    const contact = rawLinks.find((l) => l.name.toLowerCase() === "contact");
     const wedding = rawLinks.find((l) => l.name.toLowerCase() === "wedding");
+    const contact = rawLinks.find((l) => l.name.toLowerCase() === "contact");
 
     return [
       ...baseLinks,
-      ...(contact ? [contact] : []),
       ...(wedding ? [wedding] : []),
+      ...(contact ? [contact] : []),
     ];
   }, []);
 
@@ -44,87 +42,54 @@ export const Navbar: React.FC = () => {
     <>
       <nav className="fixed top-0 left-0 right-0 z-[60] px-6 md:px-12 pt-6 transition-all duration-500">
         <div
-          className={`max-w-7xl mx-auto flex items-center justify-between rounded-full px-6 md:px-10 transition-all duration-500 border border-white/10 backdrop-blur-xl bg-black/10 shadow-sm ${
-            scrolled ? "py-3 bg-black/40 border-white/5" : "py-5"
+          className={`max-w-7xl mx-auto flex items-center justify-between rounded-full px-6 md:px-10 transition-all duration-500 border border-white/10 backdrop-blur-xl bg-black/20 shadow-sm ${
+            scrolled ? "py-3 bg-black/50 border-white/10" : "py-5"
           }`}
         >
           {/* Brand Identity */}
           <Link href="/" className="group flex flex-col leading-none z-10">
-            <span className="font-serif text-xl md:text-2xl tracking-tight text-white transition-colors duration-300">
+            <span className="font-serif text-xl md:text-2xl tracking-tight text-white transition-colors duration-300 group-hover:text-white/80">
               {siteContent.brand.name}
-              <span className="text-yellow-600 dark:text-yellow-500">.</span>
+              <span className="text-yellow-500">.</span>
             </span>
-            <span className="hidden md:block text-[8px] tracking-[0.5em] uppercase text-white/30 font-medium mt-1 transition-colors group-hover:text-white/50">
+            <span className="hidden md:block text-[8px] tracking-[0.5em] uppercase text-white/40 font-medium mt-1">
               Est. Cinematography
             </span>
           </Link>
 
-          {/* Desktop Layout Navigation Links */}
-          <div
-            className="hidden md:flex items-center gap-2 z-10"
-            onMouseLeave={() => setHovered(null)}
-          >
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-2 z-10">
             {navigationLinks.map((link) => {
               const isActive = pathname === link.path;
               return (
                 <Link
                   key={link.path}
                   href={link.path}
-                  onMouseEnter={() => setHovered(link.path)}
-                  className="relative px-5 py-2 text-[10px] tracking-[0.25em] uppercase font-semibold transition-colors duration-300 text-white/70 hover:text-white"
+                  className={`relative px-5 py-2 text-[10px] tracking-[0.25em] uppercase font-semibold transition-colors duration-300 ${
+                    isActive ? "text-white" : "text-white/60 hover:text-white"
+                  }`}
                 >
-                  {/* FIX: wrapped in AnimatePresence with an explicit exit
-                      animation. Previously this pill only had enter/move
-                      behavior via layoutId — when the mouse left the whole
-                      nav (hovered -> null), it had no exit transition and
-                      just vanished instantly, which read as a glitch. Now
-                      it fades + scales down smoothly on the way out too. */}
-                  <AnimatePresence>
-                    {hovered === link.path && (
-                      <motion.span
-                        layoutId="nav-hover-pill"
-                        className="absolute inset-0 rounded-full bg-white/[0.06] border border-white/5"
-                        initial={{ opacity: 0, scale: 0.85 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.85 }}
-                        transition={{
-                          layout: { type: "spring", stiffness: 500, damping: 35 },
-                          opacity: { duration: 0.15 },
-                          scale: { duration: 0.15 },
-                        }}
-                      />
-                    )}
-                  </AnimatePresence>
-                  <span
-                    className={`relative z-10 ${
-                      isActive ? "text-yellow-500 dark:text-yellow-400" : ""
-                    }`}
-                  >
-                    {link.name}
-                  </span>
+                  <span className="relative z-10">{link.name}</span>
                   {isActive && (
                     <motion.span
                       layoutId="active-indicator"
-                      // FIX: bumped above the hover pill (z-10) so the dot
-                      // never gets visually muddied underneath the pill's
-                      // background/border when the active link is also
-                      // hovered — it now always reads on top, clearly.
-                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-yellow-500 z-20"
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-yellow-500"
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
                     />
                   )}
                 </Link>
               );
             })}
 
-            {/* Principal Action Button */}
-            <div className="ml-4">
+            {/* CTA Button */}
+            <div className="ml-4 pl-4 border-l border-white/10">
               <Link
                 href={siteContent.navbar.cta.path}
-                className="group inline-flex items-center gap-3 px-6 py-2.5 rounded-full text-[10px] tracking-[0.25em] uppercase font-bold border border-white/20 bg-white/5 text-white transition-all duration-500 hover:bg-white hover:text-black hover:border-white"
+                className="group inline-flex items-center gap-3 px-6 py-2.5 rounded-full text-[10px] tracking-[0.25em] uppercase font-bold border border-white/20 bg-white/5 text-white transition-all duration-300 hover:bg-white hover:text-black"
               >
                 <span>{siteContent.navbar.cta.text}</span>
                 <svg
-                  className="w-3 h-3 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-500"
+                  className="w-3 h-3 -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -136,11 +101,11 @@ export const Navbar: React.FC = () => {
             </div>
           </div>
 
-          {/* Minimalist Mobile Menu Toggle Trigger */}
+          {/* Mobile Menu Toggle */}
           <button
             className="md:hidden w-8 h-8 flex flex-col justify-center items-center gap-1.5 z-10 relative"
             onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle navigation drawer"
+            aria-label="Toggle navigation"
           >
             <span
               className={`h-[1px] bg-white transition-all duration-300 ease-out ${
@@ -156,7 +121,7 @@ export const Navbar: React.FC = () => {
         </div>
       </nav>
 
-      {/* Mobile Drawer Overlay */}
+      {/* Mobile Drawer */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -166,7 +131,6 @@ export const Navbar: React.FC = () => {
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="fixed inset-0 z-50 md:hidden bg-black/95 backdrop-blur-2xl flex flex-col justify-between pt-36 pb-12 px-8 overflow-hidden"
           >
-            {/* Nav Links Stack */}
             <div className="flex flex-col gap-2 max-w-xl">
               {navigationLinks.map((link, index) => {
                 const isActive = pathname === link.path;
@@ -176,16 +140,16 @@ export const Navbar: React.FC = () => {
                     initial={{ opacity: 0, x: -15 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05, duration: 0.4, ease: "easeOut" }}
-                    className="border-b border-white/5 py-4 flex items-baseline gap-4"
+                    className="border-b border-white/10 py-4 flex items-baseline gap-4"
                   >
-                    <span className="text-yellow-600 text-[10px] font-mono tracking-widest">
+                    <span className="text-white/30 text-[10px] font-mono tracking-widest">
                       0{index + 1}
                     </span>
                     <Link
                       href={link.path}
                       onClick={() => setIsOpen(false)}
                       className={`font-serif text-3xl tracking-tight transition-colors ${
-                        isActive ? "text-yellow-500" : "text-white hover:text-white/80"
+                        isActive ? "text-yellow-500" : "text-white hover:text-white/70"
                       }`}
                     >
                       {link.name}
@@ -195,7 +159,6 @@ export const Navbar: React.FC = () => {
               })}
             </div>
 
-            {/* Footer Items Inside Menu Container */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -205,12 +168,12 @@ export const Navbar: React.FC = () => {
               <Link
                 href={siteContent.navbar.cta.path}
                 onClick={() => setIsOpen(false)}
-                className="w-full text-center px-8 py-4 rounded-full text-[10px] tracking-[0.3em] uppercase font-bold border border-white/10 bg-white/5 text-white active:bg-white active:text-black transition-all"
+                className="w-full text-center px-8 py-4 rounded-full text-[10px] tracking-[0.3em] uppercase font-bold border border-white/20 bg-white/10 text-white active:bg-white active:text-black transition-all"
               >
                 {siteContent.navbar.cta.text}
               </Link>
 
-              <span className="text-[9px] tracking-[0.4em] uppercase text-white/20 font-medium">
+              <span className="text-[9px] tracking-[0.4em] uppercase text-white/30 font-medium">
                 © {new Date().getFullYear()} {siteContent.brand.name}
               </span>
             </motion.div>

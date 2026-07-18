@@ -2,9 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, PanInfo } from "framer-motion";
-import { GALLERY_DATA } from "@/data/gallery";
-import { GalleryItem } from "@/types";
 import Image from "next/image";
+import { GALLERY_DATA } from "@/data/gallery";
 
 const CATEGORIES = [
   "All",
@@ -16,403 +15,259 @@ const CATEGORIES = [
   "Other Events",
 ];
 
-const ExpandIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className={className}>
-    <path d="M9 3H3v6M15 3h6v6M9 21H3v-6M15 21h6v-6" />
-  </svg>
-);
-
-const ChevronIcon: React.FC<{ className?: string; direction: "left" | "right" }> = ({
-  className,
-  direction,
-}) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    className={className}
-  >
-    {direction === "left" ? <path d="M15 18l-6-6 6-6" /> : <path d="M9 18l6-6-6-6" />}
-  </svg>
-);
-
-// Slide + fade variants, direction-aware for swipe/next/prev
-const slideVariants = {
-  enter: (direction: number) => ({
-    opacity: 0,
-    x: direction > 0 ? 80 : -80,
-    scale: 0.98,
-  }),
-  center: {
-    opacity: 1,
-    x: 0,
-    scale: 1,
-  },
-  exit: (direction: number) => ({
-    opacity: 0,
-    x: direction > 0 ? -80 : 80,
-    scale: 0.98,
-  }),
-};
-
 export default function Gallery() {
-  const [filter, setFilter] = useState<string>("All");
+  const [filter, setFilter] = useState("All");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [direction, setDirection] = useState(0);
-  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
 
   const filteredItems = GALLERY_DATA.filter((item) =>
     filter === "All" ? true : item.category === filter
   );
 
-  const lightboxItem =
-    lightboxIndex !== null ? filteredItems[lightboxIndex] : null;
+  const activeItem = lightboxIndex !== null ? filteredItems[lightboxIndex] : null;
 
-  const goToNext = useCallback(() => {
-    setLightboxIndex((prev) => {
-      if (prev === null) return prev;
-      setDirection(1);
-      return (prev + 1) % filteredItems.length;
-    });
-  }, [filteredItems.length]);
-
-  const goToPrev = useCallback(() => {
-    setLightboxIndex((prev) => {
-      if (prev === null) return prev;
-      setDirection(-1);
-      return (prev - 1 + filteredItems.length) % filteredItems.length;
-    });
-  }, [filteredItems.length]);
+  const paginate = useCallback(
+    (newDirection: number) => {
+      if (lightboxIndex === null) return;
+      setDirection(newDirection);
+      let nextIndex = lightboxIndex + newDirection;
+      if (nextIndex < 0) nextIndex = filteredItems.length - 1;
+      if (nextIndex >= filteredItems.length) nextIndex = 0;
+      setLightboxIndex(nextIndex);
+    },
+    [lightboxIndex, filteredItems.length]
+  );
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKey = (e: KeyboardEvent) => {
       if (lightboxIndex === null) return;
       if (e.key === "Escape") setLightboxIndex(null);
-      if (e.key === "ArrowRight") goToNext();
-      if (e.key === "ArrowLeft") goToPrev();
+      if (e.key === "ArrowRight") paginate(1);
+      if (e.key === "ArrowLeft") paginate(-1);
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [lightboxIndex, goToNext, goToPrev]);
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [lightboxIndex, paginate]);
 
   useEffect(() => {
-    document.body.style.overflow = lightboxIndex !== null ? "hidden" : "unset";
-    return () => {
-      document.body.style.overflow = "unset";
-    };
+    document.body.style.overflow = lightboxIndex !== null ? "hidden" : "";
   }, [lightboxIndex]);
 
-  // Reset lightbox if filter changes and index would be out of range
-  useEffect(() => {
-    if (lightboxIndex !== null && lightboxIndex >= filteredItems.length) {
-      setLightboxIndex(null);
-    }
-  }, [filteredItems.length, lightboxIndex]);
-
-  const handleDragEnd = (
-    _e: MouseEvent | TouchEvent | PointerEvent,
-    info: PanInfo
-  ) => {
-    const swipeThreshold = 60;
-    const velocityThreshold = 400;
-
-    if (
-      info.offset.x < -swipeThreshold ||
-      info.velocity.x < -velocityThreshold
-    ) {
-      goToNext();
-    } else if (
-      info.offset.x > swipeThreshold ||
-      info.velocity.x > velocityThreshold
-    ) {
-      goToPrev();
-    }
+  const handleSwipe = (e: any, { offset, velocity }: PanInfo) => {
+    const swipePower = Math.abs(offset.x) * velocity.x;
+    if (swipePower < -400) paginate(1);
+    else if (swipePower > 400) paginate(-1);
   };
 
   return (
-    <div className="pt-40 pb-24 px-6 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        {/* Editorial Header */}
-        <div className="mb-14 md:mb-20 text-center">
-          <span className="text-[10px] tracking-[0.5em] uppercase text-yellow-600/80 font-semibold">
+    <div className="relative min-h-screen pt-32 pb-40 px-4 md:px-8">
+      {/* Title Area */}
+      <div className="max-w-7xl mx-auto mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="font-serif italic text-4xl md:text-5xl text-white tracking-tight">
             The Collection
-          </span>
-          <h1 className="font-serif italic text-4xl md:text-6xl text-white mt-4">
-            Moments, Curated
           </h1>
+          <p className="text-white/40 text-xs tracking-[0.2em] uppercase mt-3">
+            Cinematic Archives
+          </p>
         </div>
+        <span className="text-yellow-600 font-mono text-sm tracking-widest">
+          {String(filteredItems.length).padStart(3, "0")} ORIGINALS
+        </span>
+      </div>
 
-        {/* Magazine-style Index Grid */}
-        <motion.div
-          initial={{ opacity: 0, y: -12 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-16 md:mb-24"
-        >
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 border-t border-l border-white/10">
-            {CATEGORIES.map((cat, i) => {
-              const active = filter === cat;
-              return (
-                <button
-                  key={cat}
-                  onClick={() => {
-                    setFilter(cat);
-                  }}
-                  className="relative border-r border-b border-white/10 px-5 py-6 text-left transition-colors duration-300 group"
-                >
-                  <span
-                    className={`block text-[9px] tracking-[0.3em] mb-2 transition-colors ${
-                      active ? "text-yellow-600" : "text-zinc-600 group-hover:text-zinc-500"
-                    }`}
-                  >
-                    {String(i).padStart(2, "0")}
-                  </span>
-                  <span
-                    className={`block text-[11px] md:text-xs uppercase tracking-[0.25em] transition-colors duration-300 ${
-                      active ? "text-white font-semibold" : "text-zinc-500 group-hover:text-zinc-300"
-                    }`}
-                  >
-                    {cat}
-                  </span>
-
-                  {active && (
-                    <motion.span
-                      layoutId="gallery-tab-dot"
-                      className="absolute bottom-5 right-5 w-1.5 h-1.5 rounded-full bg-yellow-600"
-                      transition={{ type: "spring", stiffness: 400, damping: 35 }}
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </motion.div>
-
-        {/* Grid */}
-        <div className="relative min-h-[400px]">
-          <AnimatePresence mode="wait">
-            {filteredItems.length > 0 ? (
+      {/* Fluid Masonry Grid */}
+      <div className="max-w-7xl mx-auto">
+        <motion.div layout className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
+          <AnimatePresence>
+            {filteredItems.map((item, i) => (
               <motion.div
-                key="grid"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6"
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                key={item.id}
+                className="relative break-inside-avoid rounded-2xl overflow-hidden group cursor-pointer bg-zinc-900 border border-white/5"
+                onClick={() => setLightboxIndex(i)}
               >
-                {filteredItems.map((item, i) => {
-                  const isLoaded = loadedImages[item.id];
-
-                  return (
-                    <motion.div
-                      key={item.id}
-                      layout
-                      initial={{ opacity: 0, y: 16 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -16 }}
-                      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                      className="break-inside-avoid"
-                    >
-                      <div
-                        className="group relative overflow-hidden rounded-sm border border-white/5 cursor-pointer"
-                        onClick={() => {
-                          setDirection(0);
-                          setLightboxIndex(i);
-                        }}
-                      >
-                        <div className="relative w-full aspect-[4/5] overflow-hidden bg-zinc-900">
-                          <div
-                            className={`absolute inset-0 shimmer transition-opacity duration-700 z-10 ${
-                              isLoaded ? "opacity-0" : "opacity-100"
-                            }`}
-                          />
-                          <div
-                            className={`relative w-full h-full ${
-                              !isLoaded ? "opacity-0" : "opacity-100"
-                            } transition-opacity duration-1000`}
-                          >
-                            <Image
-                              src={item.imageUrl}
-                              alt={item.title}
-                              fill
-                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                              priority={GALLERY_DATA.indexOf(item) < 4}
-                              className="object-cover transition-all duration-700 ease-out brightness-100 scale-100 group-hover:brightness-[0.35] group-hover:scale-105 will-change-transform"
-                              onLoad={() =>
-                                setLoadedImages((prev) => ({ ...prev, [item.id]: true }))
-                              }
-                            />
-                          </div>
-
-                          {/* Issue-style index number */}
-                          <span className="absolute top-5 left-5 z-20 font-serif italic text-white/50 text-sm">
-                            {String(i + 1).padStart(2, "0")}
-                          </span>
-
-                          {/* Persistent expand cue — visible before hover, for touch users */}
-                          <div className="absolute top-5 right-5 z-20 w-9 h-9 rounded-full border flex items-center justify-center backdrop-blur-sm transition-all duration-500 border-white/25 bg-black/30 group-hover:border-yellow-600 group-hover:bg-yellow-600/90 group-hover:scale-110">
-                            <ExpandIcon className="w-3.5 h-3.5 transition-colors text-white/80 group-hover:text-black" />
-                          </div>
-                        </div>
-
-                        {/* Hover Overlay Text */}
-                        <div className="absolute inset-0 p-8 flex flex-col justify-end pointer-events-none bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out">
-                          <div className="relative z-10 translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-out">
-                            <p className="text-yellow-600 uppercase text-[9px] tracking-[0.5em] font-bold mb-3 transition-transform duration-500 ease-out group-hover:translate-y-0 translate-y-2">
-                              {item.category}
-                            </p>
-                            <h3 className="text-2xl md:text-3xl font-serif text-white italic leading-tight mb-2 transition-transform duration-500 delay-75 ease-out group-hover:translate-y-0 translate-y-2">
-                              {item.title}
-                            </h3>
-                            <p className="text-white/75 text-[12px] leading-relaxed max-w-[260px] font-light transition-transform duration-500 delay-100 ease-out group-hover:translate-y-0 translate-y-2">
-                              {item.description}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
+                <div className="relative w-full overflow-hidden">
+                  <Image
+                    src={item.imageUrl}
+                    alt={item.title}
+                    width={800}
+                    height={1200}
+                    className="w-full h-auto object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+                </div>
+                
+                {/* Visual Clue: Expand Icon */}
+                <div className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all duration-300 md:scale-75 md:group-hover:scale-100 text-white/80 hover:text-white shadow-xl">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                  </svg>
+                </div>
+                
+                <div className="absolute inset-0 flex flex-col justify-end p-6 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span className="text-yellow-500 text-[10px] tracking-[0.3em] uppercase font-bold mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                    {item.category}
+                  </span>
+                  <h3 className="text-white font-serif italic text-2xl mb-1 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">
+                    {item.title}
+                  </h3>
+                </div>
               </motion.div>
-            ) : (
-              <motion.div
-                key="empty"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="flex flex-col items-center justify-center py-32 text-center"
-              >
-                <div className="w-24 h-[1px] bg-yellow-600/30 mb-8" />
-                <h3 className="text-4xl md:text-5xl font-serif italic text-black dark:text-white mb-4">
-                  Coming Soon
-                </h3>
-                <p className="text-gray-400 uppercase tracking-[0.4em] text-[10px] font-medium">
-                  We are currently curating this collection
-                </p>
-                <div className="w-24 h-[1px] bg-yellow-600/30 mt-8" />
-              </motion.div>
-            )}
+            ))}
           </AnimatePresence>
+        </motion.div>
+      </div>
+
+      {/* Floating Filter Dock */}
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 max-w-[90vw] overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-1 p-1.5 rounded-full bg-black/40 backdrop-blur-2xl border border-white/10 shadow-2xl">
+          {CATEGORIES.map((cat) => {
+            const isActive = filter === cat;
+            return (
+              <button
+                key={cat}
+                onClick={() => {
+                  setFilter(cat);
+                  setLightboxIndex(null); 
+                }}
+                className="relative px-5 py-2.5 rounded-full text-[10px] uppercase tracking-[0.2em] font-semibold whitespace-nowrap transition-colors"
+                style={{ color: isActive ? "#000" : "rgba(255,255,255,0.6)" }}
+              >
+                {isActive && (
+                  <motion.div
+                    layoutId="filter-pill"
+                    className="absolute inset-0 bg-white rounded-full z-0"
+                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                  />
+                )}
+                <span className="relative z-10 hover:text-white transition-colors">
+                  {cat}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Lightbox */}
+      {/* Immersive Cinematic Lightbox */}
       <AnimatePresence>
-        {lightboxItem && (
+        {activeItem && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/97 backdrop-blur-xl p-4 md:p-10"
-            onClick={() => setLightboxIndex(null)}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[100] bg-black/98 backdrop-blur-2xl flex items-center justify-center overflow-hidden touch-none"
           >
-            {/* Close button */}
+            {/* Fixed Close Button */}
             <button
               onClick={() => setLightboxIndex(null)}
-              className="absolute top-6 right-6 md:top-10 md:right-10 z-50 text-white/50 hover:text-white transition-colors p-2"
+              className="fixed top-6 right-6 md:top-10 md:right-10 z-[120] w-10 h-10 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white/60 hover:text-white hover:bg-white/20 hover:scale-105 transition-all"
               aria-label="Close Lightbox"
             >
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M18 6L6 18M6 6l12 12" />
               </svg>
             </button>
 
-            {/* Counter */}
-            <div className="absolute top-7 left-6 md:top-11 md:left-10 z-50 text-white/40 text-[11px] tracking-[0.3em] uppercase font-serif italic">
-              {String(lightboxIndex! + 1).padStart(2, "0")} / {String(filteredItems.length).padStart(2, "0")}
-            </div>
-
-            {/* Prev arrow — desktop only */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                goToPrev();
-              }}
-              className="hidden md:flex absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-50 w-12 h-12 rounded-full border border-white/15 bg-black/30 backdrop-blur-sm items-center justify-center text-white/60 hover:text-black hover:bg-yellow-600 hover:border-yellow-600 transition-all duration-300"
-              aria-label="Previous image"
-            >
-              <ChevronIcon direction="left" className="w-5 h-5" />
-            </button>
-
-            {/* Next arrow — desktop only */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                goToNext();
-              }}
-              className="hidden md:flex absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 z-50 w-12 h-12 rounded-full border border-white/15 bg-black/30 backdrop-blur-sm items-center justify-center text-white/60 hover:text-black hover:bg-yellow-600 hover:border-yellow-600 transition-all duration-300"
-              aria-label="Next image"
-            >
-              <ChevronIcon direction="right" className="w-5 h-5" />
-            </button>
-
-            <AnimatePresence mode="wait" custom={direction}>
+            <AnimatePresence mode="popLayout" custom={direction}>
               <motion.div
-                key={lightboxItem.id}
+                key={activeItem.id}
                 custom={direction}
-                variants={slideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                initial={{ opacity: 0, scale: 0.95, x: direction * 50 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.95, x: direction * -50 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 drag="x"
                 dragConstraints={{ left: 0, right: 0 }}
-                dragElastic={0.6}
-                onDragEnd={handleDragEnd}
-                className="relative w-full max-w-7xl max-h-[90vh] flex flex-col md:flex-row items-center gap-8 md:gap-16 touch-pan-y"
-                onClick={(e) => e.stopPropagation()}
+                dragElastic={0.7}
+                onDragEnd={handleSwipe}
+                // pt-16 and pb-32 give breathing room so flex-1 can perfectly scale the image without overlapping UI
+                className="absolute inset-0 flex flex-col items-center justify-center cursor-grab active:cursor-grabbing w-full h-full px-4 pt-20 pb-32 md:pb-36"
               >
-                {/* Image */}
-                <div className="relative w-full md:w-2/3 h-[50vh] md:h-[85vh] pointer-events-none">
+                {/* Image Container (flex-1 + min-h-0 guarantees it dynamically shrinks to fit screen) */}
+                <div className="relative w-full max-w-5xl flex-1 min-h-0 mb-6 md:mb-10">
                   <Image
-                    src={lightboxItem.imageUrl}
-                    alt={lightboxItem.title}
+                    src={activeItem.imageUrl}
+                    alt={activeItem.title}
                     fill
-                    className="object-contain select-none"
+                    className="object-contain drop-shadow-2xl"
                     sizes="100vw"
                     priority
                     draggable={false}
                   />
                 </div>
-
-                {/* Text */}
-                <div className="w-full md:w-1/3 text-center md:text-left flex flex-col justify-center px-4 md:px-0">
-                  <motion.p
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15 }}
-                    className="text-yellow-600 uppercase text-[10px] md:text-xs tracking-[0.5em] font-bold mb-4"
-                  >
-                    {lightboxItem.category}
-                  </motion.p>
-                  <motion.h3
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.22 }}
-                    className="text-4xl md:text-6xl font-serif text-white mb-6 italic leading-tight tracking-tight"
-                  >
-                    {lightboxItem.title}
-                  </motion.h3>
-                  <div className="w-16 h-px bg-yellow-600/40 mb-6 mx-auto md:mx-0" />
-                  <motion.p
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="text-white/70 text-sm md:text-base leading-relaxed font-light italic max-w-md mx-auto md:mx-0"
-                  >
-                    {lightboxItem.description}
-                  </motion.p>
-
-                  {/* Mobile swipe hint */}
-                  <div className="md:hidden flex items-center justify-center gap-2 mt-8 text-white/30 text-[10px] tracking-[0.3em] uppercase">
-                    <ChevronIcon direction="left" className="w-3 h-3" />
-                    <span>Swipe</span>
-                    <ChevronIcon direction="right" className="w-3 h-3" />
-                  </div>
+                
+                {/* Text Container (shrink-0 guarantees text stays readable) */}
+                <div className="flex flex-col items-center text-center px-4 max-w-2xl shrink-0">
+                  <span className="text-yellow-500 text-[10px] tracking-[0.4em] uppercase font-bold mb-3">
+                    {activeItem.category}
+                  </span>
+                  <h2 className="text-white font-serif italic text-2xl md:text-4xl mb-3">
+                    {activeItem.title}
+                  </h2>
+                  <p className="text-white/60 text-xs md:text-sm font-light leading-relaxed">
+                    {activeItem.description}
+                  </p>
                 </div>
               </motion.div>
             </AnimatePresence>
+
+            {/* Fixed Pagination Dock */}
+            <div className="fixed bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 z-[110] flex items-center px-5 py-2.5 rounded-full bg-black/60 md:bg-white/10 backdrop-blur-xl border border-white/10 md:border-white/20 shadow-2xl">
+              
+              {/* Desktop Left Button */}
+              <button 
+                onClick={() => paginate(-1)} 
+                className="hidden md:block text-white/50 hover:text-white transition-colors p-2 mr-4"
+                aria-label="Previous"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+
+              {/* Mobile Swipe Hint (Left) */}
+              <div className="md:hidden flex items-center text-white/30 mr-4">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </div>
+              
+              {/* Counter */}
+              <div className="flex flex-col items-center justify-center min-w-[3rem]">
+                <span className="font-mono text-[10px] tracking-widest text-white font-semibold">
+                  {String(lightboxIndex! + 1).padStart(2, "0")}
+                </span>
+                <span className="w-4 h-px bg-white/20 my-0.5" />
+                <span className="font-mono text-[10px] tracking-widest text-white/40">
+                  {String(filteredItems.length).padStart(2, "0")}
+                </span>
+              </div>
+              
+              {/* Desktop Right Button */}
+              <button 
+                onClick={() => paginate(1)} 
+                className="hidden md:block text-white/50 hover:text-white transition-colors p-2 ml-4"
+                aria-label="Next"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </button>
+
+              {/* Mobile Swipe Hint (Right) */}
+              <div className="md:hidden flex items-center text-white/30 ml-4">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </div>
+
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
