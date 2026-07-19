@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     siteName: "CBT Weddings",
     images: [
       {
-        url: "https://i.postimg.cc/gJY27VJB/MAN09884.jpg",
+        url: "/cbt-preview.webp",
         width: 1200,
         height: 800,
         alt: "CBT Weddings Luxury Photography",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CBT Weddings | Luxury Wedding Storytelling",
     description: "CBT Weddings captures your luxury wedding moments with artistic storytelling and premium photography.",
-    images: ["https://i.postimg.cc/gJY27VJB/MAN09884.jpg"],
+    images: ["/cbt-preview.webp"],
   },
 };
 
@@ -72,7 +72,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "CBT Weddings",
-    "image": "https://i.postimg.cc/gJY27VJB/MAN09884.jpg",
+    "image": "https://www.cbtweddings.com/cbt-preview.webp",
     "@id": "https://www.cbtweddings.com",
     "url": "https://www.cbtweddings.com",
     "telephone": "+918800180670",
@@ -110,13 +110,11 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        {/* Preconnect to image host for fast OG/social preview load */}
-        <link rel="preconnect" href="https://i.postimg.cc" />
         {/* Preload the social preview image so crawlers and share cards get it fast */}
         <link
           rel="preload"
           as="image"
-          href="https://i.postimg.cc/gJY27VJB/MAN09884.jpg"
+          href="/cbt-preview.webp"
           fetchPriority="high"
         />
         {/* SVG favicon: black bg, white CBT text */}

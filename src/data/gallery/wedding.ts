@@ -215,14 +215,14 @@ export const WEDDING_GALLERY: GalleryItem[] = [
     id: "w31",
     category: "Wedding",
     imageUrl: "https://i.postimg.cc/13hBXvjm/MAV00328-Copy.jpg",
-    title: "Beautiful Wedding Moment 31",
+    title: "Beautiful Wedding Moment ",
     description: "A stunning moment captured elegantly.",
   },
   {
     id: "w32",
     category: "Wedding",
     imageUrl: "https://i.postimg.cc/wvGcp2N7/MAV09970.jpg",
-    title: "Beautiful Wedding Moment 32",
+    title: "Beautiful Wedding Moment ",
     description: "A stunning moment captured elegantly.",
   },
 ];
