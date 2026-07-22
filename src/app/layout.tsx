@@ -37,10 +37,12 @@ export const metadata: Metadata = {
     siteName: "CBT Weddings",
     images: [
       {
-        url: "/cbt-preview.jpg",
+        url: "https://www.cbtweddings.com/cbt-preview.jpg", // Changed to absolute URL
+        secureUrl: "https://www.cbtweddings.com/cbt-preview.jpg",
         width: 1200,
         height: 800,
         alt: "CBT Weddings Luxury Photography",
+        type: "image/jpeg",
       },
     ],
   },
@@ -48,7 +50,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CBT Weddings | Luxury Wedding Storytelling",
     description: "CBT Weddings captures your luxury wedding moments with artistic storytelling and premium photography.",
-    images: ["/cbt-preview.jpg"],
+    images: ["https://www.cbtweddings.com/cbt-preview.jpg"],
   },
 };
 
