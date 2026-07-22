@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     siteName: "CBT Weddings",
     images: [
       {
-        url: "/cbt-preview.webp",
+        url: "/cbt-preview.jpg",
         width: 1200,
         height: 800,
         alt: "CBT Weddings Luxury Photography",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CBT Weddings | Luxury Wedding Storytelling",
     description: "CBT Weddings captures your luxury wedding moments with artistic storytelling and premium photography.",
-    images: ["/cbt-preview.webp"],
+    images: ["/cbt-preview.jpg"],
   },
 };
 
@@ -72,7 +72,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "CBT Weddings",
-    "image": "https://www.cbtweddings.com/cbt-preview.webp",
+    "image": "https://www.cbtweddings.com/cbt-preview.jpg",
     "@id": "https://www.cbtweddings.com",
     "url": "https://www.cbtweddings.com",
     "telephone": "+918800180670",
@@ -114,7 +114,7 @@ export default function RootLayout({
         <link
           rel="preload"
           as="image"
-          href="/cbt-preview.webp"
+          href="/cbt-preview.jpg"
           fetchPriority="high"
         />
         {/* SVG favicon: black bg, white CBT text */}
