@@ -37,12 +37,12 @@ export const metadata: Metadata = {
     siteName: "CBT Weddings",
     images: [
       {
-        url: "https://www.cbtweddings.com/cbt-preview.jpg", // Changed to absolute URL
-        secureUrl: "https://www.cbtweddings.com/cbt-preview.jpg",
+        url: "https://www.cbtweddings.com/cbt-preview.webp",
+        secureUrl: "https://www.cbtweddings.com/cbt-preview.webp",
         width: 1200,
         height: 800,
         alt: "CBT Weddings Luxury Photography",
-        type: "image/jpeg",
+        type: "image/webp",
       },
     ],
   },
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "CBT Weddings | Luxury Wedding Storytelling",
     description: "CBT Weddings captures your luxury wedding moments with artistic storytelling and premium photography.",
-    images: ["https://www.cbtweddings.com/cbt-preview.jpg"],
+    images: ["https://www.cbtweddings.com/cbt-preview.webp"],
   },
 };
 
@@ -74,7 +74,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "CBT Weddings",
-    "image": "https://www.cbtweddings.com/cbt-preview.jpg",
+    "image": "https://www.cbtweddings.com/cbt-preview.webp",
     "@id": "https://www.cbtweddings.com",
     "url": "https://www.cbtweddings.com",
     "telephone": "+918800180670",
@@ -116,7 +116,7 @@ export default function RootLayout({
         <link
           rel="preload"
           as="image"
-          href="/cbt-preview.jpg"
+          href="/cbt-preview.webp"
           fetchPriority="high"
         />
         {/* SVG favicon: black bg, white CBT text */}
