@@ -16,126 +16,128 @@ const REVIEWS: Testimonial[] = [
     id: "1",
     name: "Ananya & Rohan",
     event: "The Palace Rites",
-    quote:
-      "They didn’t just document the day; they captured the soul of our silence. The way they filmed our Varmala sequence felt like a frame from a classic epic.",
+    quote: "They didn’t just document the day; they captured the soul of our silence. The way they filmed our Varmala sequence felt like a frame from a classic epic.",
   },
   {
     id: "2",
     name: "Diya & Arjun",
     event: "The Heritage Reception",
-    quote:
-      "A masterclass in editorial cinematography. They managed to find quiet, intimate moments even amidst the beautiful chaos of our grand reception.",
+    quote: "A masterclass in editorial cinematography. They managed to find quiet, intimate moments even amidst the beautiful chaos of our grand reception.",
   },
   {
     id: "3",
     name: "Meera & Sameer",
     event: "The Royal Courtyard",
-    quote:
-      "The attention to detail—from the texture of the heirloom silk to the silent exchange of glances during the Pheras—was absolutely breathtaking.",
+    quote: "The attention to detail—from the texture of the heirloom silk to the silent exchange of glances during the Pheras—was absolutely breathtaking.",
   },
   {
     id: "4",
     name: "Sara & Ishaan",
     event: "The Estate Celebration",
-    quote:
-      "Seamless, professional, and artistically superior. CBT Weddings has a way of seeing light that feels almost supernatural. Our legacy is in safe hands.",
+    quote: "Seamless, professional, and artistically superior. CBT Weddings has a way of seeing light that feels almost supernatural. Our legacy is in safe hands.",
   },
 ];
 
-export default function Testimonials() {
-  const [activeId, setActiveId] = useState<string | null>(null);
+function TestimonialCard({ 
+  review, 
+  isDimmed, 
+  onHoverStart, 
+  onHoverEnd 
+}: { 
+  review: Testimonial; 
+  isDimmed: boolean;
+  onHoverStart: () => void;
+  onHoverEnd: () => void;
+}) {
+  return (
+    <motion.div
+      onMouseEnter={onHoverStart}
+      onMouseLeave={onHoverEnd}
+      animate={{
+        opacity: isDimmed ? 0.4 : 1,
+        scale: isDimmed ? 0.98 : 1,
+        filter: isDimmed ? "blur(2px)" : "blur(0px)",
+      }}
+      transition={{ duration: 0.4, ease: [0.25, 1, 0.5, 1] }}
+      className="group relative flex flex-col justify-between rounded-[2rem] border border-white/10 bg-neutral-950/50 p-10 md:p-14 overflow-hidden backdrop-blur-md min-h-[400px] transition-colors duration-500 hover:bg-neutral-900/50 hover:border-white/20"
+    >
+      {/* Decorative Quote Mark */}
+      <div className="absolute -top-10 -left-6 text-[12rem] font-serif leading-none text-white/[0.03] select-none pointer-events-none transition-transform duration-700 group-hover:-translate-y-4 group-hover:text-yellow-600/[0.05]">
+        “
+      </div>
 
-  const handleInteraction = (id: string, isClick: boolean) => {
-    if (isClick) {
-      setActiveId((prev) => (prev === id ? null : id));
-    } else {
-      setActiveId(id);
-    }
-  };
+      <div className="relative z-10 flex flex-col gap-8 h-full justify-between">
+        <p className="text-xl md:text-2xl italic font-serif leading-relaxed text-zinc-300 group-hover:text-white transition-colors duration-500">
+          "{review.quote}"
+        </p>
+
+        <div className="flex flex-col items-start gap-1 pt-8 border-t border-white/10 group-hover:border-yellow-600/30 transition-colors duration-500">
+          <h3 className="text-xl font-serif text-white tracking-wide">
+            {review.name}
+          </h3>
+          <p className="text-[9px] uppercase tracking-[0.4em] font-bold text-yellow-600/70 group-hover:text-yellow-500 transition-colors duration-500">
+            {review.event}
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+export default function Testimonials() {
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   return (
-    <div className="py-40 px-6 overflow-hidden">
-      <SectionWrapper className="max-w-4xl mx-auto text-center mb-32">
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          className="text-yellow-600 uppercase tracking-[0.5em] text-[10px] font-bold mb-4"
-        >
-          Reflections
-        </motion.p>
-        <h2 className="text-6xl md:text-9xl font-serif text-white italic leading-none">
-          Kind Words.
-        </h2>
+    <section className="py-40 px-6 overflow-hidden bg-black selection:bg-yellow-600/30">
+      <SectionWrapper className="max-w-5xl mx-auto flex flex-col md:flex-row items-end justify-between mb-32 gap-8">
+        <div className="text-left">
+          <motion.div
+            initial={{ opacity: 0, width: 0 }}
+            whileInView={{ opacity: 1, width: "3rem" }}
+            viewport={{ once: true }}
+            className="h-px bg-yellow-600 mb-6"
+          />
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-yellow-600 uppercase tracking-[0.5em] text-[10px] font-bold mb-4"
+          >
+            Reflections
+          </motion.p>
+          <h2 className="text-5xl md:text-8xl font-serif text-white leading-[0.9]">
+            Kind <span className="italic text-zinc-500">Words.</span>
+          </h2>
+        </div>
+        <p className="max-w-xs text-sm text-zinc-400 font-light leading-relaxed">
+          Stories of love, light, and legacy told through the lens of those who lived it.
+        </p>
       </SectionWrapper>
 
-      <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12">
+      <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-6 md:gap-10 items-start">
         {REVIEWS.map((review, idx) => {
-          const isActive = activeId === review.id;
-
+          const isDimmed = hoveredId !== null && hoveredId !== review.id;
+          
           return (
-            <SectionWrapper
-              key={review.id}
-              direction={idx % 2 === 0 ? "left" : "right"}
-              delay={idx * 0.1}
+            <div 
+              key={review.id} 
+              className={idx % 2 === 1 ? "md:mt-24" : ""}
             >
-              <motion.div
-                onClick={() => handleInteraction(review.id, true)}
-                onMouseEnter={() => handleInteraction(review.id, false)}
-                onMouseLeave={() => setActiveId(null)}
-                animate={{
-                  borderColor: isActive
-                    ? "rgba(202, 138, 4, 0.3)"
-                    : "rgba(255, 255, 255, 0.05)",
-                  y: isActive ? -10 : 0,
-                  backgroundColor: isActive
-                    ? "rgba(255, 255, 255, 0.05)"
-                    : "rgba(255, 255, 255, 0)",
-                }}
-                transition={{ duration: 0.4, ease: "easeOut" }}
-                className="glass rounded-[3rem] p-10 md:p-16 border relative overflow-hidden cursor-pointer"
+              <SectionWrapper
+                direction={idx % 2 === 0 ? "left" : "right"}
+                delay={idx * 0.15}
               >
-                <div className="flex flex-col items-start gap-2 mb-10 relative z-10">
-                  <h3 className="text-2xl font-serif text-white">
-                    {review.name}
-                  </h3>
-                  <motion.p
-                    animate={{ color: isActive ? "#ca8a04" : "#ca8a04" }}
-                    className="text-[10px] uppercase tracking-[0.3em] font-bold"
-                  >
-                    {review.event}
-                  </motion.p>
-                </div>
-
-                <motion.p
-                  animate={{ color: isActive ? "#f3f4f6" : "#a1a1aa" }}
-                  className="text-xl md:text-2xl italic font-serif leading-relaxed relative z-10"
-                >
-                  "{review.quote}"
-                </motion.p>
-
-                {/* Decorative Quote SVG */}
-                <motion.div
-                  animate={{
-                    opacity: isActive ? 0.1 : 0.03,
-                    scale: isActive ? 1 : 0.8,
-                    rotate: isActive ? 0 : -5,
-                  }}
-                  className="absolute -bottom-8 -right-8 text-white pointer-events-none"
-                >
-                  <svg
-                    width="200"
-                    height="200"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                  >
-                    <path d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017C19.5693 16 20.017 15.5523 20.017 15V9C20.017 8.44772 19.5693 8 19.017 8H16.017C15.4647 8 15.017 8.44772 15.017 9V12C15.017 12.5523 14.5693 13 14.017 13H12.017V21H14.017ZM5.017 21L5.017 18C5.017 16.8954 5.91243 16 7.017 16H10.017C10.5693 16 11.017 15.5523 11.017 15V9C11.017 8.44772 10.5693 8 10.017 8H7.017C6.46472 8 6.017 8.44772 6.017 9V12C6.017 12.5523 5.56929 13 5.017 13H3.017V21H5.017Z" />
-                  </svg>
-                </motion.div>
-              </motion.div>
-            </SectionWrapper>
+                <TestimonialCard 
+                  review={review}
+                  isDimmed={isDimmed}
+                  onHoverStart={() => setHoveredId(review.id)}
+                  onHoverEnd={() => setHoveredId(null)}
+                />
+              </SectionWrapper>
+            </div>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }
