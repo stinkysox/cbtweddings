@@ -1,53 +1,9 @@
-import { GalleryItem } from "@/types";
-
-export const ENGAGEMENT_GALLERY: GalleryItem[] = [
-  {
-    id: "e1",
-    category: "Engagement",
-    imageUrl: "https://i.postimg.cc/mrMGMpbn/behance-img-54.jpg",
-    title: "The Ring & The Promise",
-    description: "A moment where forever was quietly decided.",
-  },
-  {
-    id: "e2",
-    category: "Engagement",
-    imageUrl: "https://i.postimg.cc/RFBxT1h0/behance-img-55.jpg",
-    title: "She Said Yes",
-    description: "A celebration of love sealed with joy.",
-  },
-  {
-    id: "e3",
-    category: "Engagement",
-    imageUrl: "https://i.postimg.cc/MTW1YjJs/MAN00674.jpg",
-    title: "A New Chapter",
-    description: "Where excitement meets heartfelt emotion.",
-  },
-  {
-    id: "e4",
-    category: "Engagement",
-    imageUrl: "https://i.postimg.cc/fLBmqTwM/MAN02027.jpg",
-    title: "Forever Starts Today",
-    description: "An unforgettable beginning to a lifelong story.",
-  },
-  {
-    id: "e5",
-    category: "Engagement",
-    imageUrl: "https://i.postimg.cc/LXNLQ6H9/MAN04643.jpg",
-    title: "Captured in Love",
-    description: "Soft smiles and unspoken promises.",
-  },
-  {
-    id: "e6",
-    category: "Engagement",
-    imageUrl: "https://i.postimg.cc/85mQXFfw/MAV09590.jpg",
-    title: "Just Us Two",
-    description: "An intimate moment away from the world.",
-  },
-  {
-    id: "e7",
-    category: "Engagement",
-    imageUrl: "https://i.postimg.cc/85mQXFfw/MAV09590.jpg",
-    title: "A Promise in Gold",
-    description: "Love captured in its most radiant form.",
-  },
+export const ENGAGEMENT_GALLERY: string[] = [
+  "https://i.postimg.cc/1zmr8Wjx/behance-img-54.jpg",
+  "https://i.postimg.cc/sg9JDFKm/behance-img-55.jpg",
+  "https://i.postimg.cc/y8zPH6hW/MAN00674.jpg",
+  "https://i.postimg.cc/jSQhdVvy/MAN02027.jpg",
+  "https://i.postimg.cc/Z5FLKkjj/MAN04643.jpg",
+  "https://i.postimg.cc/cJxBvDbs/MAV08828.jpg",
+  "https://i.postimg.cc/VkBFLy4t/MAV09590.jpg",
 ];

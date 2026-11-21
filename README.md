@@ -1,5 +1,11 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Adding gallery photos
+
+Drop local image files (`.jpg`, `.jpeg`, `.png`, `.webp`, `.avif`, or `.gif`) into the matching folder under `public/gallery/`: `weddings`, `pre-wedding`, `engagement`, `rituals`, `family`, or `other-events`. No title or description is needed. While `npm run dev` is running, the gallery refreshes when files are added or removed; `npm run build` also refreshes the index before building.
+
+Hosted image links are still supported: paste each image URL as a string into the matching category file under `src/data/gallery/`. No ID, title, or description is needed. Linked images load directly from their host to avoid image-optimizer timeouts; local folder images continue to use Next.js optimization. Local folder photos and linked photos are shown together. Do not edit `src/data/gallery/local.generated.ts`; it is generated from the folders.
+
 ## Getting Started
 
 First, run the development server:

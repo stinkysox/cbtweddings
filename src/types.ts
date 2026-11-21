@@ -15,8 +15,6 @@ export interface GalleryItem {
   id: string;
   category: GalleryCategory;
   imageUrl: string;
-  title: string;
-  description: string;
 }
 
 // Testimonial

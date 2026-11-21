@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { SectionWrapper } from "../../components/SectionWrapper";
 import Link from "next/link";
 import { siteContent } from "../../data/siteContent";
@@ -44,16 +45,23 @@ export default function About() {
               onClick={() => setIsImageFocused(!isImageFocused)}
               className="aspect-[3/4] rounded-[3rem] overflow-hidden shadow-2xl relative cursor-pointer"
             >
-              <motion.img
+              <motion.div
                 animate={{
                   filter: isImageFocused ? "grayscale(0%)" : "grayscale(100%)",
                   scale: isImageFocused ? 1.05 : 1,
                 }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] as any }}
-                src={about.philosophy.image}
-                alt="Architecture"
-                className="w-full h-full object-cover"
-              />
+                className="absolute inset-0"
+              >
+                <Image
+                  src={about.philosophy.image}
+                  alt="Architecture"
+                  fill
+                  unoptimized={about.philosophy.image.startsWith("https://")}
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover"
+                />
+              </motion.div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
 
               <div className="absolute bottom-8 left-1/2 -translate-x-1/2 md:hidden">
@@ -187,24 +195,32 @@ export default function About() {
                 whileInView={{ y: 0, opacity: 1 }}
                 initial={{ y: 40, opacity: 0 }}
                 transition={{ duration: 1, delay: 0.2 }}
-                className="aspect-[4/5] rounded-[2rem] overflow-hidden translate-y-12 shadow-xl"
+                className="relative aspect-[4/5] rounded-[2rem] overflow-hidden translate-y-12 shadow-xl"
               >
-                <img
+                <Image
                   src={about.archive.images[0]}
                   alt="Detail 1"
-                  className="w-full h-full object-cover"
+                  fill
+                  unoptimized={about.archive.images[0].startsWith("https://")}
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  loading="lazy"
+                  className="object-cover"
                 />
               </motion.div>
               <motion.div
                 whileInView={{ y: 0, opacity: 1 }}
                 initial={{ y: -40, opacity: 0 }}
                 transition={{ duration: 1, delay: 0.4 }}
-                className="aspect-[4/5] rounded-[2rem] overflow-hidden shadow-xl"
+                className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-xl"
               >
-                <img
+                <Image
                   src={about.archive.images[1]}
                   alt="Detail 2"
-                  className="w-full h-full object-cover"
+                  fill
+                  unoptimized={about.archive.images[1].startsWith("https://")}
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  loading="lazy"
+                  className="object-cover"
                 />
               </motion.div>
             </div>

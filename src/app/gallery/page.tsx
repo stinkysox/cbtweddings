@@ -134,9 +134,12 @@ export default function Gallery() {
                 <div className="relative w-full overflow-hidden">
                   <Image
                     src={item.imageUrl}
-                    alt={item.title}
+                    alt={`${item.category} photo ${i + 1}`}
                     width={800}
                     height={1200}
+                    unoptimized={item.imageUrl.startsWith("https://")}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                    loading="lazy"
                     className="w-full h-auto object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
                 </div>
@@ -148,14 +151,6 @@ export default function Gallery() {
                   </svg>
                 </div>
                 
-                <div className="absolute inset-0 flex flex-col justify-end p-6 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="text-yellow-500 text-[10px] tracking-[0.3em] uppercase font-bold mb-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                    {item.category}
-                  </span>
-                  <h3 className="text-white font-serif italic text-2xl mb-1 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">
-                    {item.title}
-                  </h3>
-                </div>
               </motion.div>
             ))}
           </AnimatePresence>
@@ -237,27 +232,16 @@ export default function Gallery() {
                 <div className="relative w-full max-w-5xl flex-1 min-h-0 mb-6 md:mb-10">
                   <Image
                     src={activeItem.imageUrl}
-                    alt={activeItem.title}
+                    alt={`${activeItem.category} photo ${lightboxIndex! + 1}`}
                     fill
+                    unoptimized={activeItem.imageUrl.startsWith("https://")}
                     className="object-contain drop-shadow-2xl"
-                    sizes="100vw"
+                    sizes="(max-width: 768px) 100vw, 90vw"
                     priority
                     draggable={false}
                   />
                 </div>
                 
-                {/* Text Container */}
-                <div className="flex flex-col items-center text-center px-4 max-w-2xl shrink-0">
-                  <span className="text-yellow-500 text-[10px] tracking-[0.4em] uppercase font-bold mb-3">
-                    {activeItem.category}
-                  </span>
-                  <h2 className="text-white font-serif italic text-2xl md:text-4xl mb-3">
-                    {activeItem.title}
-                  </h2>
-                  <p className="text-white/60 text-xs md:text-sm font-light leading-relaxed">
-                    {activeItem.description}
-                  </p>
-                </div>
               </motion.div>
             </AnimatePresence>
 

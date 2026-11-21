@@ -28,6 +28,8 @@ export default function Home() {
             alt="CBT Weddings Hero"
             fill
             priority
+            unoptimized
+            sizes="100vw"
             className="object-cover object-center"
           />
           {/* Overlay to ensure text readability */}
@@ -114,6 +116,7 @@ export default function Home() {
                 src={home.intro.image}
                 alt="Brand Intro"
                 fill
+                unoptimized={home.intro.image.startsWith("https://")}
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover transition-transform duration-[2s] hover:scale-110"
               />

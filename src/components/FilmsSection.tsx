@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { SectionWrapper } from "./SectionWrapper";
 import Aurora from "./Aurora";
 
@@ -75,11 +76,14 @@ const FilmPlayer = ({ film, isEven }: { film: Film; isEven: boolean }) => {
             onClick={() => setIsPlaying(true)}
           >
             {/* Background Thumbnail Image with subtle hover scale */}
-            <img
+            <Image
               src={thumbnailUrl}
               alt={`${film.title} Cinematic Thumbnail`}
-              className="absolute inset-0 w-full h-full object-cover opacity-60 transition-transform duration-[1.5s] ease-out group-hover:scale-105"
+              fill
+              unoptimized
+              sizes="(max-width: 768px) 100vw, 60vw"
               loading="lazy"
+              className="object-cover opacity-60 transition-transform duration-[1.5s] ease-out group-hover:scale-105"
             />
 
             {/* Premium, Minimalist Custom Play Overlay */}

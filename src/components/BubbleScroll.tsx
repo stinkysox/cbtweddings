@@ -10,6 +10,7 @@ import {
   MotionValue,
   useMotionTemplate,
 } from "framer-motion";
+import Image from "next/image";
 
 import { GALLERY_DATA } from "@/data/gallery";
 
@@ -93,11 +94,13 @@ const Bubble: React.FC<{
         }}
         className="rounded-full overflow-hidden border border-white/20 shadow-[0_20px_60px_rgba(0,0,0,0.3)] pointer-events-none"
       >
-        <img
+        <Image
           src={config.url}
           alt="Wedding moment"
+          fill
+          unoptimized={config.url.startsWith("https://")}
+          sizes="(max-width: 640px) 62vw, 440px"
           loading="lazy"
-          decoding="async"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-white/10 pointer-events-none" />
@@ -212,7 +215,15 @@ export const BubbleScroll: React.FC = () => {
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 px-6">
           {bubbles.map((b, i) => (
             <div key={i} className="aspect-square rounded-full overflow-hidden border border-white/10">
-              <img src={b.url} alt="Wedding moment" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+              <Image
+                src={b.url}
+                alt="Wedding moment"
+                fill
+                unoptimized={b.url.startsWith("https://")}
+                sizes="(max-width: 768px) 50vw, 25vw"
+                loading="lazy"
+                className="w-full h-full object-cover"
+              />
             </div>
           ))}
         </div>

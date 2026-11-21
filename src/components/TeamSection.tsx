@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { SectionWrapper } from "./SectionWrapper";
 
 // Team Members
@@ -63,9 +64,13 @@ export const TeamSection = () => {
             >
               <div className="group flex flex-col items-center">
                 <div className="relative w-full aspect-[2/3] overflow-hidden rounded-[2rem] md:rounded-[3rem] shadow-2xl border border-white/10 bg-white/5">
-                  <img
+                  <Image
                     src={member.image}
                     alt={member.name}
+                    fill
+                    unoptimized
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    loading="lazy"
                     className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0"
                   />
 

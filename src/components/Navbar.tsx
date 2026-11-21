@@ -3,7 +3,12 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useMotionValueEvent,
+} from "framer-motion";
 import { siteContent } from "../data/siteContent";
 
 export const Navbar: React.FC = () => {
@@ -26,7 +31,7 @@ export const Navbar: React.FC = () => {
   const navigationLinks = useMemo(() => {
     const rawLinks = siteContent.navbar?.links || [];
     const baseLinks = rawLinks.filter(
-      (l) => !["contact", "wedding"].includes(l.name.toLowerCase())
+      (l) => !["contact", "wedding"].includes(l.name.toLowerCase()),
     );
     const wedding = rawLinks.find((l) => l.name.toLowerCase() === "wedding");
     const contact = rawLinks.find((l) => l.name.toLowerCase() === "contact");
@@ -71,7 +76,11 @@ export const Navbar: React.FC = () => {
                     <motion.span
                       layoutId="active-indicator"
                       className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-yellow-500"
-                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 500,
+                        damping: 30,
+                      }}
                     />
                   )}
                 </Link>
@@ -111,7 +120,9 @@ export const Navbar: React.FC = () => {
             />
             <span
               className={`h-[1px] bg-white transition-all duration-300 ease-out ${
-                isOpen ? "-rotate-45 -translate-y-[3.5px] w-5" : "w-3.5 self-end"
+                isOpen
+                  ? "-rotate-45 -translate-y-[3.5px] w-5"
+                  : "w-3.5 self-end"
               }`}
             />
           </button>
@@ -136,7 +147,11 @@ export const Navbar: React.FC = () => {
                     key={link.path}
                     initial={{ opacity: 0, x: -15 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05, duration: 0.4, ease: "easeOut" }}
+                    transition={{
+                      delay: index * 0.05,
+                      duration: 0.4,
+                      ease: "easeOut",
+                    }}
                     className="border-b border-white/10 py-4 flex items-baseline gap-4"
                   >
                     <span className="text-white/30 text-[10px] font-mono tracking-widest">
@@ -146,7 +161,9 @@ export const Navbar: React.FC = () => {
                       href={link.path}
                       onClick={() => setIsOpen(false)}
                       className={`font-serif text-3xl tracking-tight transition-colors ${
-                        isActive ? "text-yellow-500" : "text-white hover:text-white/70"
+                        isActive
+                          ? "text-yellow-500"
+                          : "text-white hover:text-white/70"
                       }`}
                     >
                       {link.name}
